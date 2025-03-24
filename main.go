@@ -78,7 +78,7 @@ func main() {
 
 	r = global.InitRouter(r)
 	go func() {
-		if err := r.Run(":8080"); err != nil {
+		if err := r.Run(":9090"); err != nil {
 			global.Logger.Fatal("Server error", zap.Error(err))
 		}
 	}()
