@@ -5,14 +5,42 @@ import (
 	"asynctaskhub/global"
 	"asynctaskhub/src/model"
 	"asynctaskhub/src/service/queue"
+	"asynctaskhub/src/types"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 	"time"
 )
 
 type ControllerApiTaskQueue struct {
 	ControllerApiBase
+}
+
+type requestCreateTaskQueue struct {
+	TaskCode           string          `json:"task_code" binding:"required"`
+	Parameters         string          `json:"parameters"`
+	RelativeDelayTime  int             `json:"relative_delay_time"`
+	DelayExecutionTime types.Timestamp `json:"delay_execution_time"`
+}
+
+type responseTaskQueue struct {
+	ID                    int                            `json:"id"`
+	AppID                 int                            `json:"app_id"`
+	TaskID                int                            `json:"task_id"`
+	Parameters            string                         `json:"parameters"`
+	RelativeDelayTime     int                            `json:"relative_delay_time"`
+	DelayExecutionTime    types.Timestamp                `json:"delay_execution_time"`
+	ExecutionTime         types.Timestamp                `json:"execution_time"`
+	ExecutionStatus       model.TaskQueueExecutionStatus `json:"execution_status"`
+	ExecutionStatusString string                         `json:"execution_status_string"`
+	ExecutionStart        *types.Customtime              `json:"execution_start"`
+	ExecutionEnd          *types.Customtime              `json:"execution_end"`
+	ExecutionDuration     int64                          `json:"execution_duration"`
+	ExecutionCount        int                            `json:"execution_count"`
+	CreatedAt             types.Customtime               `json:"created_at"`
+	UpdatedAt             types.Customtime               `json:"updated_at"`
+	Taskname              string                         `json:"taskname"`
+	ExecutorURL           string                         `json:"executor_url"`
+	Appname               string                         `json:"appname"`
 }
 
 func (c *ControllerApiTaskQueue) GetList(ctx *gin.Context) {
@@ -23,19 +51,17 @@ func (c *ControllerApiTaskQueue) GetList(ctx *gin.Context) {
 	start := ctx.DefaultQuery("start", "")
 	end := ctx.DefaultQuery("end", "")
 
-	query := global.DB.Preload("Task", func(db *gorm.DB) *gorm.DB {
-		return db.Select("id", "app_id", "name", "task_code")
-	}).Model(&model.TaskQueue{})
+	query := global.DB.Model(&model.TaskQueue{})
 	if adminInfo.Role != model.GlobalAdmin {
-		query = query.Where("app_id IN ?", adminInfo.AppIDs)
+		query = query.Where("task_queues.app_id IN ?", adminInfo.AppIDs)
 	}
 
 	if start != "" {
-		query = query.Where("created_at >=?", start)
+		query = query.Where("task_queues.created_at >=?", start)
 	}
 
 	if end != "" {
-		query = query.Where("created_at <=?", end)
+		query = query.Where("task_queues.created_at <=?", end)
 	}
 
 	var total int64
@@ -45,15 +71,19 @@ func (c *ControllerApiTaskQueue) GetList(ctx *gin.Context) {
 		return
 	}
 
-	var taskQueueLists []model.TaskQueue
-	if err := query.Omit("parameters").Order("id desc").Limit(pageSize).Offset((page - 1) * pageSize).Find(&taskQueueLists).Error; err != nil {
+	var responseTaskQueues []responseTaskQueue
+	if err := query.Omit("task_queues.parameters").Order("task_queues.id desc").Limit(pageSize).Offset((page - 1) * pageSize).Find(&responseTaskQueues).Error; err != nil {
 		global.Logger.Warn("获取队列列表失败", zap.Error(err))
 		c.JSONResponse(ctx, false, "获取队列列表失败", nil)
 		return
 	}
 
+	for i, taskQueue := range responseTaskQueues {
+		responseTaskQueues[i].ExecutionStatusString = taskQueue.ExecutionStatus.String()
+	}
+
 	c.JSONResponse(ctx, true, "获取队列列表成功", gin.H{
-		"list":  taskQueueLists,
+		"list":  responseTaskQueues,
 		"total": total,
 	})
 }
@@ -67,28 +97,25 @@ func (c *ControllerApiTaskQueue) GetDetail(ctx *gin.Context) {
 		return
 	}
 
-	query := global.DB.Preload("Task")
+	query := global.DB.Model(&model.TaskQueue{}).
+		Joins("LEFT JOIN tasks ON tasks.id = task_queues.task_id").
+		Joins("LEFT JOIN applications ON applications.id = task_queues.app_id").
+		Select("task_queues.*, tasks.name as taskname, tasks.executor_url, applications.name as appname")
 	if adminInfo.Role != model.GlobalAdmin {
-		query = query.Where("app_id IN?", adminInfo.AppIDs)
+		query = query.Where("task_queues.app_id IN?", adminInfo.AppIDs)
 	}
-	var taskQueue model.TaskQueue
-	if err := query.First(&taskQueue, id).Error; err != nil {
+	var responseTaskQueue responseTaskQueue
+	if err := query.First(&responseTaskQueue, id).Error; err != nil {
 		global.Logger.Warn("获取任务队列详情失败", zap.Error(err))
 		c.JSONResponse(ctx, false, "获取任务队列详情失败", nil)
 		return
 	}
-	c.JSONResponse(ctx, true, "获取任务队列详情成功", &taskQueue)
-}
-
-type TaskQueueRequest struct {
-	TaskCode           string `json:"task_code" binding:"required"`
-	Parameters         string `json:"parameters"`
-	RelativeDelayTime  int    `json:"relative_delay_time"`
-	DelayExecutionTime int    `json:"delay_execution_time"`
+	responseTaskQueue.ExecutionStatusString = responseTaskQueue.ExecutionStatus.String()
+	c.JSONResponse(ctx, true, "获取任务队列详情成功", &responseTaskQueue)
 }
 
 func (c *ControllerApiTaskQueue) Create(ctx *gin.Context) {
-	var input TaskQueueRequest
+	var input requestCreateTaskQueue
 
 	appInfo := c.CheckApp(ctx)
 
@@ -110,18 +137,16 @@ func (c *ControllerApiTaskQueue) Create(ctx *gin.Context) {
 	taskQueue.TaskID = task.ID
 	taskQueue.Parameters = input.Parameters
 	taskQueue.RelativeDelayTime = input.RelativeDelayTime
-	taskQueue.DelayExecutionTime = input.DelayExecutionTime
+	taskQueue.DelayExecutionTime = types.Timestamp(input.DelayExecutionTime)
 	taskQueue.ExecutionStatus = model.TaskQueuePending
 	taskQueue.ExecutionCount = 0
-	taskQueue.CreatedAt = time.Now()
-	taskQueue.UpdatedAt = time.Now()
 
 	if input.RelativeDelayTime != 0 {
-		taskQueue.ExecutionTime = int(time.Now().Unix()) + input.RelativeDelayTime
+		taskQueue.ExecutionTime = types.Timestamp(int(time.Now().Unix()) + input.RelativeDelayTime)
 	} else if input.DelayExecutionTime != 0 {
-		taskQueue.ExecutionTime = input.DelayExecutionTime
+		taskQueue.ExecutionTime = types.Timestamp(input.DelayExecutionTime)
 	} else {
-		taskQueue.ExecutionTime = int(time.Now().Unix())
+		taskQueue.ExecutionTime = types.Timestamp(time.Now().Unix())
 	}
 
 	if err := global.DB.Omit("Task").Create(&taskQueue).Error; err != nil {

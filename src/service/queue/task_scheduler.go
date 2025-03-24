@@ -88,7 +88,7 @@ func (s *TaskScheduler) StartTaskQueueListener(ctx context.Context) {
 }
 
 func (s *TaskScheduler) StartTaskQueueMonitor(ctx context.Context) {
-	s.QueueService.RecoverLostTasks(true)
+	s.QueueService.RecoverLostTasks()
 
 	ticker := time.NewTicker(time.Minute)
 	defer ticker.Stop()
@@ -99,7 +99,7 @@ func (s *TaskScheduler) StartTaskQueueMonitor(ctx context.Context) {
 			global.Logger.Info("StartTaskQueueMonitor stopped.")
 			return
 		case <-ticker.C:
-			s.QueueService.RecoverLostTasks(false)
+			s.QueueService.RecoverLostTasks()
 		}
 	}
 }

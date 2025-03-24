@@ -7,7 +7,6 @@ import (
 	"asynctaskhub/src/service"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"time"
 )
 
 type ControllerApiTask struct {
@@ -117,8 +116,6 @@ func (c *ControllerApiTask) Create(ctx *gin.Context) {
 		TaskCode:    input.TaskCode,
 		ExecutorURL: input.ExecutorURL,
 		Name:        input.Name,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
 	}
 	if err := global.DB.Create(&task).Error; err != nil {
 		global.Logger.Warn("创建任务失败", zap.Error(err))
@@ -167,7 +164,6 @@ func (c *ControllerApiTask) Update(ctx *gin.Context) {
 	task.Name = input.Name
 	task.TaskCode = input.TaskCode
 	task.ExecutorURL = input.ExecutorURL
-	task.UpdatedAt = time.Now()
 	if err := global.DB.Omit("app_id", "created_at").Save(&task).Error; err != nil {
 		global.Logger.Warn("更新任务失败", zap.Error(err))
 		c.JSONResponse(ctx, false, "更新任务失败", nil)

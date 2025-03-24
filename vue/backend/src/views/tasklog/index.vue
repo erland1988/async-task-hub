@@ -40,13 +40,10 @@ const handleSearch = () => {
 // 表格相关
 let columns = ref([
     { prop: 'id', label: 'ID', width: 55, align: 'center' },
-    { prop: 'app_id', label: '应用ID' },
-    { prop: 'task_id', label: '任务ID' },
-    { prop: 'task_queue_id', label: '队列ID' },
     { prop: 'request_id', label: '请求ID' },
-    { prop: 'action', label: '动作' },
+    { prop: 'action_string', label: '动作' },
     { prop: 'created_at', label: '创建时间' },
-    { prop: 'operator', label: '操作', width: 250 },
+    { prop: 'operator', label: '操作', width: 250, buttons: ['view'] },
 ])
 const page = reactive({
     index: 1,
@@ -74,42 +71,44 @@ const viewData = ref({
     list: []
 });
 const handleView = (row: TaskLog) => {
-    viewData.value.row = { ...row }
-    viewData.value.list = [
-        {
+    simpleApi.get('/api/tasklog/getDetail', { id: row.id }, permiss.token, function(data){
+        viewData.value.row = data;
+        viewData.value.list = [
+          {
             prop: 'id',
             label: 'ID',
-        },
-        {
-            prop: 'app_id',
-            label: '应用ID',
-        },
-        {
-            prop: 'task_id',
-            label: '任务ID',
-        },
-        {
+          },
+          {
+            prop: 'app_name',
+            label: '应用',
+          },
+          {
+            prop: 'task_name',
+            label: '任务',
+          },
+          {
             prop: 'task_queue_id',
             label: '队列ID',
-        },
-        {
+          },
+          {
             prop: 'request_id',
             label: '请求ID',
-        },
-        {
-            prop: 'action',
+          },
+          {
+            prop: 'action_string',
             label: '动作',
-        },
-        {
-          prop: 'message',
-          label: '信息',
-        },
-        {
-          prop: 'created_at',
-          label: '创建时间',
-        },
-    ]
-    visible1.value = true;
+          },
+          {
+            prop: 'message',
+            label: '信息',
+          },
+          {
+            prop: 'created_at',
+            label: '创建时间',
+          },
+        ]
+        visible1.value = true;
+    });
 };
 
 </script>

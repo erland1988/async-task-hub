@@ -6,6 +6,7 @@ export interface TaskLog {
     task_queue_id: number;
     request_id: string;
     action: string;
+    action_string: string;
     message: string;
     created_at: string;
 }

@@ -5,6 +5,7 @@ import (
 	"asynctaskhub/global"
 	"asynctaskhub/src/model"
 	"asynctaskhub/src/service"
+	"asynctaskhub/src/types"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"time"
@@ -118,6 +119,12 @@ func (c *ControllerApiAdmin) Create(ctx *gin.Context) {
 		return
 	}
 
+	if input.Email != "" {
+		if err := common.ValidateEmail(input.Email); err != nil {
+			c.JSONResponse(ctx, false, "邮箱格式错误", nil)
+			return
+		}
+	}
 	admin := model.Admin{
 		Username:  input.Username,
 		Password:  common.HashMD5(input.Password),
@@ -126,14 +133,13 @@ func (c *ControllerApiAdmin) Create(ctx *gin.Context) {
 		Email:     input.Email,
 		Role:      input.Role,
 		ExpiresAt: common.FormatDatetime(input.ExpiresAt),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
 	}
 	if err := global.DB.Create(&admin).Error; err != nil {
 		global.Logger.Warn("创建管理员失败", zap.Error(err))
 		c.JSONResponse(ctx, false, "创建管理员失败", nil)
 		return
 	}
+	service.NewLogService().CreateLog(adminInfo.ID, "创建管理员", admin)
 	c.JSONResponse(ctx, true, "创建管理员成功", nil)
 }
 
@@ -152,15 +158,22 @@ func (c *ControllerApiAdmin) UpdateProfile(ctx *gin.Context) {
 		c.JSONResponse(ctx, false, "更新用户信息失败", nil)
 		return
 	}
+
+	if input.Email != "" {
+		if err := common.ValidateEmail(input.Email); err != nil {
+			c.JSONResponse(ctx, false, "邮箱格式错误", nil)
+			return
+		}
+	}
 	admin.Truename = input.Truename
 	admin.Phone = input.Phone
 	admin.Email = input.Email
-	admin.UpdatedAt = time.Now()
 	if err := global.DB.Select("truename", "phone", "email", "updated_at").Save(&admin).Error; err != nil {
 		global.Logger.Warn("更新用户信息失败", zap.Error(err))
 		c.JSONResponse(ctx, false, "更新用户信息失败", nil)
 		return
 	}
+	service.NewLogService().CreateLog(adminInfo.ID, "更新用户信息", admin)
 	c.JSONResponse(ctx, true, "更新用户信息成功", nil)
 }
 
@@ -188,12 +201,12 @@ func (c *ControllerApiAdmin) ResetPassword(ctx *gin.Context) {
 		return
 	}
 	admin.Password = common.HashMD5(input.NewPassword)
-	admin.UpdatedAt = time.Now()
 	if err := global.DB.Select("password", "updated_at").Save(&admin).Error; err != nil {
 		global.Logger.Warn("更新密码失败", zap.Error(err))
 		c.JSONResponse(ctx, false, "更新密码失败", nil)
 		return
 	}
+	service.NewLogService().CreateLog(adminInfo.ID, "更新密码", admin)
 	c.JSONResponse(ctx, true, "更新密码成功", nil)
 }
 
@@ -216,7 +229,12 @@ func (c *ControllerApiAdmin) Update(ctx *gin.Context) {
 		c.JSONResponse(ctx, false, "更新管理员失败", nil)
 		return
 	}
-
+	if input.Email != "" {
+		if err := common.ValidateEmail(input.Email); err != nil {
+			c.JSONResponse(ctx, false, "邮箱格式错误", nil)
+			return
+		}
+	}
 	admin.Username = input.Username
 	if input.Password != "" {
 		admin.Password = common.HashMD5(input.Password)
@@ -231,12 +249,12 @@ func (c *ControllerApiAdmin) Update(ctx *gin.Context) {
 		expiresAt := common.FormatDatetime(input.ExpiresAt)
 		admin.ExpiresAt = expiresAt
 	}
-	admin.UpdatedAt = time.Now()
 	if err := global.DB.Omit("created_at").Save(&admin).Error; err != nil {
 		global.Logger.Warn("更新管理员失败", zap.Error(err))
 		c.JSONResponse(ctx, false, "更新管理员失败", nil)
 		return
 	}
+	service.NewLogService().CreateLog(adminInfo.ID, "更新管理员", admin)
 	c.JSONResponse(ctx, true, "更新管理员成功", nil)
 }
 
@@ -259,47 +277,8 @@ func (c *ControllerApiAdmin) Delete(ctx *gin.Context) {
 		return
 	}
 
+	service.NewLogService().CreateLog(adminInfo.ID, "删除管理员", id)
 	c.JSONResponse(ctx, true, "删除管理员成功", nil)
-}
-
-func (c *ControllerApiAdmin) GetLoginLog(ctx *gin.Context) {
-	adminInfo := c.CheckAdmin(ctx)
-	if adminInfo.Role != model.GlobalAdmin {
-		c.JSONResponse(ctx, false, "未授权访问", nil)
-		return
-	}
-
-	page, pageSize := c.GetPaginationParams(ctx, "page", "page_size")
-	keywords := ctx.DefaultQuery("keywords", "")
-
-	query := global.DB.Preload("Admin").Model(&model.Login{}).Joins("LEFT JOIN admins ON logins.admin_id = admins.id")
-	if keywords != "" {
-		query = query.Where("(admins.truename LIKE ? or admins.username LIKE ?)", "%"+keywords+"%", "%"+keywords+"%")
-	}
-	var total int64
-	if err := query.Count(&total).Error; err != nil {
-		global.Logger.Warn("获取登录日志失败", zap.Error(err))
-		c.JSONResponse(ctx, false, "获取登录日志失败", nil)
-		return
-	}
-
-	var logins []model.Login
-	if err := query.Order("logins.id desc").Limit(pageSize).Offset((page - 1) * pageSize).Find(&logins).Error; err != nil {
-		global.Logger.Warn("获取登录日志失败", zap.Error(err))
-		c.JSONResponse(ctx, false, "获取登录日志失败", nil)
-		return
-	}
-
-	for i, login := range logins {
-		if len(login.Token) > 12 {
-			logins[i].Token = login.Token[:6] + "..." + login.Token[len(login.Token)-6:]
-		}
-	}
-
-	c.JSONResponse(ctx, true, "获取登录日志成功", gin.H{
-		"list":  logins,
-		"total": total,
-	})
 }
 
 func (c *ControllerApiAdmin) Registry(ctx *gin.Context) {
@@ -317,14 +296,13 @@ func (c *ControllerApiAdmin) Registry(ctx *gin.Context) {
 	admin.Role = model.AppAdmin
 
 	expiresAt := time.Now().AddDate(0, 3, 0)
-	admin.ExpiresAt = expiresAt
-	admin.CreatedAt = time.Now()
-	admin.UpdatedAt = time.Now()
+	admin.ExpiresAt = types.Customtime(expiresAt)
 	if err := global.DB.Create(&admin).Error; err != nil {
 		global.Logger.Warn("注册管理员失败", zap.Error(err))
 		c.JSONResponse(ctx, false, "注册管理员失败", nil)
 		return
 	}
+	service.NewLogService().CreateLog(admin.ID, "注册", admin)
 	c.JSONResponse(ctx, true, "注册管理员成功", admin)
 }
 
@@ -344,7 +322,7 @@ func (c *ControllerApiAdmin) Login(ctx *gin.Context) {
 		return
 	}
 
-	if admin.ExpiresAt.Before(time.Now()) {
+	if time.Time(admin.ExpiresAt).Before(time.Now()) {
 		c.JSONResponse(ctx, false, "账号已过期", nil)
 		return
 	}
@@ -353,16 +331,17 @@ func (c *ControllerApiAdmin) Login(ctx *gin.Context) {
 	var login model.Login
 	login.AdminID = admin.ID
 	login.Token = token
-	login.CreatedAt = time.Now()
-	login.ExpiresAt = time.Now().Add(time.Hour * 2)
+	expiresAt := time.Now().Add(time.Hour * 2)
+	login.ExpiresAt = types.Customtime(expiresAt)
 	if err := global.DB.Create(&login).Error; err != nil {
 		global.Logger.Warn("登录失败", zap.Error(err))
 		c.JSONResponse(ctx, false, "登录失败", nil)
 		return
 	}
+	service.NewLogService().CreateLog(admin.ID, "登录", login)
 	c.JSONResponse(ctx, true, "登录成功", gin.H{
 		"username":   admin.Username,
-		"role":       model.RoleNames[admin.Role],
+		"rolename":   model.Rolenames[admin.Role],
 		"truename":   admin.Truename,
 		"phone":      admin.Phone,
 		"email":      admin.Email,
@@ -381,12 +360,11 @@ func (c *ControllerApiAdmin) Loginout(ctx *gin.Context) {
 		c.JSONResponse(ctx, false, "退出登录失败", nil)
 		return
 	}
-	//过期时间等于当前时间减3秒
-	login.ExpiresAt = time.Now().Add(-3 * time.Second)
-	if err := global.DB.Select("expires_at").Save(&login).Error; err != nil {
+	if err := global.DB.Delete(&login).Error; err != nil {
 		global.Logger.Warn("退出登录失败", zap.Error(err))
 		c.JSONResponse(ctx, false, "退出登录失败", nil)
 		return
 	}
+	service.NewLogService().CreateLog(adminInfo.ID, "退出登录", login)
 	c.JSONResponse(ctx, true, "退出登录成功", nil)
 }

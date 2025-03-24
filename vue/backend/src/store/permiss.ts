@@ -22,7 +22,7 @@ export const usePermissStore = defineStore('permiss', {
         clearAuthData() {
             this.key = [];
             this.token = '';
-            this.configMap = {};
+            this.config = {};
             localStorage.removeItem('admin:permiss');
             localStorage.removeItem('admin:token');
             localStorage.removeItem('admin:config');

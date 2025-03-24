@@ -86,12 +86,6 @@ export const menuData: Menus[] = [
             {
                 id: '61',
                 pid: '6',
-                index: '/system-login-log',
-                title: '登录日志',
-            },
-            {
-                id: '62',
-                pid: '6',
                 index: '/system-log',
                 title: '操作日志',
             }

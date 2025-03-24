@@ -87,20 +87,11 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('../views/tasklog/index.vue'),
             },
             {
-                path: '/system-login-log',
-                name: 'system-login-log',
-                meta: {
-                    title: '登录日志',
-                    permiss: '61',
-                },
-                component: () => import('../views/system/login-log.vue'),
-            },
-            {
                 path: '/system-log',
                 name: 'system-log',
                 meta: {
                     title: '操作日志',
-                    permiss: '62',
+                    permiss: '61',
                 },
                 component: () => import('../views/system/log.vue'),
             },

@@ -20,9 +20,9 @@
 
 <script setup lang="ts" name="user-index">
 import { ref, reactive } from 'vue';
-import { ElMessage } from 'element-plus';
+import {ElMessage, FormRules} from 'element-plus';
 import { CirclePlusFilled } from '@element-plus/icons-vue';
-import { User } from '@/types/user';
+import {User, UserEdit} from '@/types/user';
 import {simpleApi} from '@/api';
 import TableCustom from '@/components/table-custom.vue';
 import TableDetail from '@/components/table-detail.vue';
@@ -47,10 +47,9 @@ let columns = ref([
     { prop: 'id', label: 'ID', width: 55, align: 'center' },
     { prop: 'username', label: '用户名' },
     { prop: 'truename', label: '真实姓名' },
-    { prop: 'role', label: '角色' },
+    { prop: 'rolename', label: '角色' },
     { prop: 'expires_at', label: '到期时间' },
     { prop: 'created_at', label: '创建时间', },
-    { prop: 'updated_at', label: '更新时间' },
     { prop: 'operator', label: '操作', width: 250 },
 ])
 const page = reactive({
@@ -78,8 +77,10 @@ let options = ref<FormOption>({
     span: 12,
     list: [
         { type: 'input', label: '用户名', prop: 'username', required: true },
-        { type: 'input', label: '密码', prop: 'password', required: true },
-        { type: 'input', label: '真实姓名', prop: 'truename', required: true },
+        { type: 'input', label: '密码', prop: 'password', required: false },
+        { type: 'input', label: '真实姓名', prop: 'truename', required: false },
+        { type: 'input', label: '手机号', prop: 'phone', required: false },
+        { type: 'input', label: '邮箱', prop: 'email', required: false },
         { type: 'select', label: '角色', prop: 'role', required: true, opts: [
             { label: '超级管理员', value: 'global_admin' },
             { label: '应用管理员', value: 'app_admin' },
@@ -92,7 +93,6 @@ const visible = ref(false);
 const isEdit = ref(false);
 const rowData = ref({});
 const handleEdit = (row: User) => {
-    rowData.value = { ...row };
     simpleApi.get('/api/admin/getDetail', { id: row.id }, permiss.token, function(data) {
       rowData.value = data;
       isEdit.value = true;
@@ -101,12 +101,31 @@ const handleEdit = (row: User) => {
 };
 const updateData = (row: User) => {
    if(isEdit.value){
-     simpleApi.post('/api/admin/update', row, permiss.token, function(data) {
+     const params = {
+       id: row.id,
+       username: row.username,
+       password: row.password,
+       truename: row.truename,
+       phone: row.phone,
+       email: row.email,
+       role: row.role,
+       expires_at: row.expires_at,
+     }
+     simpleApi.post('/api/admin/update', params, permiss.token, function(data) {
        closeDialog();
        getData();
      })
    }else{
-     simpleApi.post('/api/admin/create', row, permiss.token, function(data) {
+     const params = {
+       username: row.username,
+       password: row.password,
+       truename: row.truename,
+       phone: row.phone,
+       email: row.email,
+       role: row.role,
+       expires_at: row.expires_at,
+     }
+     simpleApi.post('/api/admin/create', params, permiss.token, function(data) {
        closeDialog();
        getData();
      })
@@ -145,12 +164,28 @@ const handleView = (row: User) => {
           label: '真实姓名',
         },
         {
-          prop: 'role',
+          prop: 'phone',
+          label: '手机号',
+        },
+        {
+          prop: 'email',
+          label: '邮箱',
+        },
+        {
+          prop: 'rolename',
           label: '角色',
+        },
+        {
+          prop: 'expires_at',
+          label: '到期时间',
         },
         {
           prop: 'created_at',
           label: '创建时间',
+        },
+        {
+          prop: 'updated_at',
+          label: '更新时间',
         },
       ]
       visible1.value = true;

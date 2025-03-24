@@ -49,7 +49,6 @@ let columns = ref([
     { prop: 'task_code', label: '任务标识' },
     { prop: 'executor_url', label: '执行器' },
     { prop: 'created_at', label: '创建时间' },
-    { prop: 'created_at', label: '更新时间' },
     { prop: 'operator', label: '操作', width: 250 },
 ])
 const page = reactive({
@@ -85,13 +84,35 @@ const visible = ref(false);
 const isEdit = ref(false);
 const rowData = ref({});
 const handleEdit = (row: Task) => {
-    rowData.value = { ...row };
-    isEdit.value = true;
-    visible.value = true;
+    simpleApi.get('/api/task/getDetail', { id: row.id }, permiss.token, function(data) {
+      rowData.value = data;
+      isEdit.value = true;
+      visible.value = true;
+    })
 };
-const updateData = () => {
-    closeDialog();
-    getData();
+const updateData = (row: Task) => {
+    if(isEdit.value){
+      const params = {
+        id: row.id,
+        name: row.name,
+        task_code: row.task_code,
+        executor_url: row.executor_url,
+      }
+      simpleApi.post('/api/task/update', params, permiss.token, function(data) {
+        closeDialog();
+        getData();
+      })
+    }else{
+      const params = {
+        name: row.name,
+        task_code: row.task_code,
+        executor_url: row.executor_url,
+      }
+      simpleApi.post('/api/task/create', params, permiss.token, function(data) {
+        closeDialog();
+        getData();
+      })
+    }
 };
 
 const closeDialog = () => {
@@ -106,34 +127,36 @@ const viewData = ref({
     list: []
 });
 const handleView = (row: Task) => {
-    viewData.value.row = { ...row }
-    viewData.value.list = [
+    simpleApi.get('/api/task/getDetail', { id: row.id }, permiss.token, function(data){
+      viewData.value.row = data;
+      viewData.value.list = [
         {
-            prop: 'id',
-            label: 'ID',
+          prop: 'id',
+          label: 'ID',
         },
         {
-            prop: 'name',
-            label: '任务名称',
+          prop: 'name',
+          label: '任务名称',
         },
         {
-            prop: 'task_code',
-            label: '任务标识',
+          prop: 'task_code',
+          label: '任务标识',
         },
         {
-            prop: 'executor_url',
-            label: '执行器URL',
+          prop: 'executor_url',
+          label: '执行器URL',
         },
         {
-            prop: 'created_at',
-            label: '创建时间',
+          prop: 'created_at',
+          label: '创建时间',
         },
         {
-            prop: 'updated_at',
-            label: '修改时间',
+          prop: 'updated_at',
+          label: '修改时间',
         },
-    ]
-    visible1.value = true;
+      ]
+      visible1.value = true;
+    })
 };
 
 // 删除相关

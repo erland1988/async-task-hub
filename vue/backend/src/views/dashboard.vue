@@ -51,7 +51,7 @@
             <el-col :span="18">
                 <el-card shadow="hover">
                     <div class="card-header">
-                        <p class="card-header-title">订单动态</p>
+                        <p class="card-header-title">队列动态</p>
                         <p class="card-header-desc">最近一周队列执行情况</p>
                     </div>
                     <v-chart class="chart" :option="dashOpt1" />

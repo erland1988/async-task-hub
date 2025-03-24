@@ -4,6 +4,7 @@ import (
 	"asynctaskhub/common"
 	"asynctaskhub/global"
 	"asynctaskhub/src/model"
+	"asynctaskhub/src/types"
 	"go.uber.org/zap"
 	"strconv"
 	"time"
@@ -77,19 +78,19 @@ func (s *DatabaseService) createAdmins() ([]model.Admin, error) {
 		Username:  "root",
 		Password:  common.HashMD5("123456"),
 		Role:      model.GlobalAdmin,
-		ExpiresAt: time.Now().AddDate(10, 0, 0),
+		ExpiresAt: types.Customtime(time.Now().AddDate(10, 0, 0)),
 	})
 	admins = append(admins, model.Admin{
 		Username:  "admin",
 		Password:  common.HashMD5("123456"),
 		Role:      model.GlobalAdmin,
-		ExpiresAt: time.Now().AddDate(10, 0, 0),
+		ExpiresAt: types.Customtime(time.Now().AddDate(10, 0, 0)),
 	})
 	admins = append(admins, model.Admin{
 		Username:  "test",
 		Password:  common.HashMD5("123456"),
 		Role:      model.AppAdmin,
-		ExpiresAt: time.Now().AddDate(10, 0, 0),
+		ExpiresAt: types.Customtime(time.Now().AddDate(10, 0, 0)),
 	})
 	if err := global.DB.Create(&admins).Error; err != nil {
 		return nil, err
@@ -142,7 +143,7 @@ func (s *DatabaseService) createTaskQueues(tasks []model.Task) error {
 				AppID:             task.AppID,
 				TaskID:            task.ID,
 				RelativeDelayTime: 3,
-				ExecutionTime:     int(time.Now().Add(3 * time.Second).Unix()),
+				ExecutionTime:     types.Timestamp(time.Now().Add(3 * time.Second).Unix()),
 				ExecutionStatus:   model.TaskQueuePending,
 			})
 		}

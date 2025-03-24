@@ -38,17 +38,13 @@ const handleSearch = () => {
 // 表格相关
 let columns = ref([
     { prop: 'id', label: 'ID', width: 55, align: 'center' },
-    { prop: 'task_id', label: '任务ID' },
     { prop: 'relative_delay_time', label: '延迟时间' },
     { prop: 'delay_execution_time', label: '绝对时间' },
-    { prop: 'execution_status', label: '状态' },
-    { prop: 'execution_start', label: '开始时间' },
-    { prop: 'execution_end', label: '结束时间' },
+    { prop: 'execution_status_string', label: '状态' },
     { prop: 'execution_duration', label: '执行时长(毫秒)' },
     { prop: 'execution_count', label: '执行次数' },
     { prop: 'created_at', label: '创建时间' },
-    { prop: 'created_at', label: '更新时间' },
-    { prop: 'operator', label: '操作', width: 250 },
+    { prop: 'operator', label: '操作', width: 250, buttons: ['view'] },
 ])
 const page = reactive({
     index: 1,
@@ -84,24 +80,16 @@ const handleView = (row: TaskQueue) => {
             label: 'ID',
         },
         {
-            prop: 'app_id',
-            label: '应用ID',
+            prop: 'appname',
+            label: '应用',
         },
         {
-            prop: 'task_id',
-            label: '任务ID',
+          prop: 'taskname',
+          label: '任务',
         },
         {
-          label: '任务名称',
-          formatter: () => row.task.name?row.task.name:'-',
-        },
-        {
-          label: '任务标识',
-          formatter: () => row.task.task_code?row.task.task_code:'-',
-        },
-        {
+          prop: 'executor_url',
           label: '执行器URL',
-          formatter: () => row.task.executor_url?row.task.executor_url:'-',
         },
         {
             prop: 'parameters',
@@ -116,16 +104,16 @@ const handleView = (row: TaskQueue) => {
             label: '绝对时间',
         },
         {
-            prop: 'execution_status',
+            prop: 'execution_status_string',
             label: '状态',
         },
         {
           prop: 'execution_start',
-          label: '开始时间',
+          label: '执行开始时间',
         },
         {
           prop: 'execution_end',
-          label: '结束时间',
+          label: '执行结束时间',
         },
         {
           prop: 'execution_duration',

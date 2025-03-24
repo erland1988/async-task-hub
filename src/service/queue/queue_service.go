@@ -4,6 +4,7 @@ import (
 	"asynctaskhub/common"
 	"asynctaskhub/global"
 	"asynctaskhub/src/model"
+	"asynctaskhub/src/types"
 	"context"
 	"errors"
 	"github.com/go-redis/redis/v8"
@@ -46,9 +47,10 @@ func (s *QueueService) PushTaskToQueue(taskQueue *model.TaskQueue) error {
 	if taskQueue.ExecutionTime == 0 {
 		return errors.New("taskQueue.ExecutionTime is required")
 	}
-	futureTime := time.Now().Add(s.futureTime).Unix()
-	if taskQueue.ExecutionTime > int(futureTime) {
-		global.Logger.Info("taskQueue.ExecutionTime is too far in the future", zap.Int("taskQueue.ExecutionTime", taskQueue.ExecutionTime), zap.Int("futureTime", int(futureTime)))
+	futureTime := types.Timestamp(time.Now().Add(s.futureTime).Unix())
+	if taskQueue.ExecutionTime > futureTime {
+		global.Logger.Info("taskQueue.ExecutionTime is too far in the future", zap.Int("taskQueue.ExecutionTime", int(taskQueue.ExecutionTime)), zap.Int("futureTime", int(futureTime)))
+
 		return nil
 	}
 
@@ -129,19 +131,16 @@ func (s *QueueService) ProcessTaskQueue(ctx context.Context, taskQueueID int) er
 }
 
 // 恢复 Redis 队列中丢失的任务
-func (s *QueueService) RecoverLostTasks(reload bool) {
+func (s *QueueService) RecoverLostTasks() {
 	var taskQueues []model.TaskQueue
 
-	if reload {
-		global.REDIS.Del(context.Background(), s.recoverLostTaskslockKey)
-	}
 	success, err := global.REDIS.SetNX(context.Background(), s.recoverLostTaskslockKey, "locked", s.recoverTime).Result()
 	if err != nil || !success {
 		return
 	}
 
 	global.Logger.Info("RecoverLostTasks start")
-	futureTime := time.Now().Add(s.futureTime).Unix()
+	futureTime := types.Timestamp(time.Now().Add(s.futureTime).Unix())
 
 	query := global.DB
 	query = query.Where("execution_status IN (?,?)", model.TaskQueuePending, model.TaskQueueFailed)
@@ -182,7 +181,7 @@ func (s *QueueService) startTaskQueueConsumer(taskQueue *model.TaskQueue, taskLo
 		}
 	}
 
-	if taskQueue.ExecutionTime > int(time.Now().Unix()) {
+	if taskQueue.ExecutionTime > types.Timestamp(time.Now().Unix()) {
 		return nil
 	}
 
@@ -194,8 +193,8 @@ func (s *QueueService) startTaskQueueConsumer(taskQueue *model.TaskQueue, taskLo
 	taskLog.RequestID = requestID
 	taskLog.Action = model.TaskLogActionStart
 	taskLog.Message = taskQueue.Parameters
-	taskLog.Timestamp = time.Now().UnixMilli()
-	taskLog.CreatedAt = time.Now()
+	taskLog.MilliTimestamp = types.MilliTimestamp(time.Now().UnixMilli())
+	taskLog.CreatedAt = types.Customtime(time.Now())
 
 	if err := tx.Create(&taskLog).Error; err != nil {
 		tx.Rollback()
@@ -206,7 +205,7 @@ func (s *QueueService) startTaskQueueConsumer(taskQueue *model.TaskQueue, taskLo
 	taskQueue.ExecutionStatus = model.TaskQueueProcessing
 	executionCount := taskQueue.ExecutionCount + 1
 	taskQueue.ExecutionCount = executionCount
-	taskQueue.UpdatedAt = time.Now()
+	taskQueue.UpdatedAt = types.Customtime(time.Now())
 
 	if err := tx.Select("execution_status", "execution_count", "updated_at").Save(&taskQueue).Error; err != nil {
 		tx.Rollback()
@@ -230,8 +229,8 @@ func (s *QueueService) endTaskQueueConsumer(taskQueue *model.TaskQueue, taskLog 
 	taskLog.TaskQueueID = taskQueue.ID
 	taskLog.RequestID = requestID
 	taskLog.Action = model.TaskLogActionEnd
-	taskLog.Timestamp = time.Now().UnixMilli()
-	taskLog.CreatedAt = time.Now()
+	taskLog.MilliTimestamp = types.MilliTimestamp(time.Now().UnixMilli())
+	taskLog.CreatedAt = types.Customtime(time.Now())
 	if err := tx.Save(&taskLog).Error; err != nil {
 		tx.Rollback()
 		global.Logger.Error("endTaskQueueConsumer", zap.Error(err))
@@ -242,10 +241,10 @@ func (s *QueueService) endTaskQueueConsumer(taskQueue *model.TaskQueue, taskLog 
 	if shouldRetry {
 		delaySeconds := s.getNextRetryDelay(taskQueue.ExecutionCount)
 		global.Logger.Debug("getNextRetryDelay", zap.Any("executionCount", taskQueue.ExecutionCount), zap.Any("delaySeconds", delaySeconds))
-		taskQueue.ExecutionTime = int(time.Now().Add(time.Duration(delaySeconds) * time.Second).Unix())
+		taskQueue.ExecutionTime = types.Timestamp(time.Now().Add(time.Duration(delaySeconds) * time.Second).Unix())
 	}
 
-	taskQueue.UpdatedAt = time.Now()
+	taskQueue.UpdatedAt = types.Customtime(time.Now())
 	if err := tx.Select("execution_status", "execution_time", "updated_at").Save(&taskQueue).Error; err != nil {
 		tx.Rollback()
 		global.Logger.Error("endTaskQueueConsumer", zap.Error(err))
@@ -288,24 +287,24 @@ func (s *QueueService) recoverDuration(taskQueueID int, requestID string) error 
 	var endTime int64
 	for _, taskLog := range taskLogs {
 		if taskLog.Action == model.TaskLogActionStart {
-			startTime = taskLog.Timestamp
+			startTime = int64(taskLog.MilliTimestamp)
 		}
 		if taskLog.Action == model.TaskLogActionEnd {
-			endTime = taskLog.Timestamp
+			endTime = int64(taskLog.MilliTimestamp)
 		}
 	}
 	if startTime > 0 {
-		startTimeTime := time.UnixMilli(startTime)
+		startTimeTime := types.Customtime(time.UnixMilli(startTime))
 		taskQueue.ExecutionStart = &startTimeTime
 	}
 	if endTime > 0 {
-		endTimeTime := time.UnixMilli(endTime)
+		endTimeTime := types.Customtime(time.UnixMilli(endTime))
 		taskQueue.ExecutionEnd = &endTimeTime
 	}
 	if startTime > 0 && endTime > 0 && endTime >= startTime {
 		taskQueue.ExecutionDuration = endTime - startTime
 	}
-	taskQueue.UpdatedAt = time.Now()
+	taskQueue.UpdatedAt = types.Customtime(time.Now())
 	if err := global.DB.Select("execution_start", "execution_end", "execution_time", "execution_duration", "updated_at").Save(&taskQueue).Error; err != nil {
 		global.Logger.Error("recoverDuration", zap.Error(err))
 		return err

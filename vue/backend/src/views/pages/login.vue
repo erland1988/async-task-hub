@@ -78,7 +78,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
             simpleApi.postForm('/api/admin/login', param, '', function(data){
               ElMessage.success('登录成功');
               localStorage.setItem('admin:username', data.username);
-              localStorage.setItem('admin:role', data.role);
+              localStorage.setItem('admin:rolename', data.rolename);
               localStorage.setItem('admin:truename', data.truename);
               localStorage.setItem('admin:phone', data.phone);
               localStorage.setItem('admin:email', data.email);

@@ -1,6 +1,9 @@
 package common
 
-import "time"
+import (
+	"asynctaskhub/src/types"
+	"time"
+)
 
 // 将 int 时间戳转换为字符串
 func FormatTimestamp(timestamp int) string {
@@ -11,18 +14,18 @@ func FormatTimestamp(timestamp int) string {
 }
 
 // 格式化 *time.Time 类型
-func FormatTime(t *time.Time) string {
+func FormatTime(t *types.Customtime) string {
 	if t == nil {
 		return ""
 	}
-	return t.Format("2006-01-02 15:04:05")
+	return time.Time(*t).Format("2006-01-02 15:04:05")
 }
 
 // 格式化时间字符串
-func FormatDatetime(datetime string) time.Time {
+func FormatDatetime(datetime string) types.Customtime {
 	t, err := time.ParseInLocation("2006-01-02 15:04:05", datetime, time.Local)
 	if err != nil {
-		return time.Time{}
+		return types.Customtime{}
 	}
-	return t
+	return types.Customtime(t)
 }

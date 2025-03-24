@@ -29,6 +29,7 @@ import TableDetail from '@/components/table-detail.vue';
 import TableSearch from '@/components/table-search.vue';
 import { FormOption, FormOptionList } from '@/types/form-option';
 import {usePermissStore} from "@/store/permiss";
+import {User} from "@/types/user";
 
 const permiss = usePermissStore();
 // 查询相关
@@ -46,11 +47,9 @@ const handleSearch = () => {
 let columns = ref([
     { prop: 'id', label: 'ID', width: 55, align: 'center' },
     { prop: 'name', label: '应用名称' },
+    { prop: 'username', label: '用户' },
     { prop: 'app_key', label: '应用标识' },
-    { prop: 'app_secret', label: '应用秘钥' },
-    { prop: 'remark', label: '描述' },
     { prop: 'created_at', label: '创建时间' },
-    { prop: 'created_at', label: '更新时间' },
     { prop: 'operator', label: '操作', width: 250 },
 ])
 const page = reactive({
@@ -87,13 +86,37 @@ const visible = ref(false);
 const isEdit = ref(false);
 const rowData = ref({});
 const handleEdit = (row: App) => {
-    rowData.value = { ...row };
-    isEdit.value = true;
-    visible.value = true;
+    simpleApi.get('/api/app/getDetail', { id: row.id }, permiss.token, function(data) {
+      rowData.value = data;
+      isEdit.value = true;
+      visible.value = true;
+    })
 };
-const updateData = () => {
-    closeDialog();
-    getData();
+const updateData = (row: App) => {
+    if(isEdit.value){
+      const params = {
+        id: row.id,
+        name: row.name,
+        app_key: row.app_key,
+        app_secret: row.app_secret,
+        remark: row.remark,
+      }
+      simpleApi.post('/api/app/update', params, permiss.token, function(data) {
+        closeDialog();
+        getData();
+      })
+    }else{
+      const params = {
+        name: row.name,
+        app_key: row.app_key,
+        app_secret: row.app_secret,
+        remark: row.remark,
+      }
+      simpleApi.post('/api/app/create', params, permiss.token, function(data) {
+        closeDialog();
+        getData();
+      })
+    }
 };
 
 const closeDialog = () => {
@@ -108,38 +131,40 @@ const viewData = ref({
     list: []
 });
 const handleView = (row: App) => {
-    viewData.value.row = { ...row }
-    viewData.value.list = [
+    simpleApi.get('/api/app/getDetail', { id: row.id }, permiss.token, function(data){
+      viewData.value.row = data;
+      viewData.value.list = [
         {
-            prop: 'id',
-            label: 'ID',
+          prop: 'id',
+          label: 'ID',
         },
         {
-            prop: 'name',
-            label: '应用名称',
+          prop: 'name',
+          label: '应用名称',
         },
         {
-            prop: 'app_key',
-            label: '应用标识',
+          prop: 'app_key',
+          label: '应用标识',
         },
         {
-            prop: 'app_secret',
-            label: '应用秘钥',
+          prop: 'app_secret',
+          label: '应用秘钥',
         },
         {
-            prop: 'remark',
-            label: '备注',
+          prop: 'created_at',
+          label: '创建时间',
         },
         {
-            prop: 'created_at',
-            label: '创建时间',
+          prop: 'updated_at',
+          label: '更新时间',
         },
         {
-            prop: 'updated_at',
-            label: '更新时间',
+          prop: 'remark',
+          label: '备注',
         },
-    ]
-    visible1.value = true;
+      ]
+      visible1.value = true;
+    })
 };
 
 // 删除相关

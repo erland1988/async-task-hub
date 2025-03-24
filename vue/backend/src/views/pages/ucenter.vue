@@ -6,7 +6,7 @@
                 <div class="user-info">
                     <div class="info-name">{{ username }}</div>
                     <div class="info-desc">
-                      <span>{{ role }}</span>
+                      <span>{{ rolename }}</span>
                       <el-divider direction="vertical" />
                       <span>{{ expiresAt }}</span>
                     </div>
@@ -15,7 +15,7 @@
             </el-card>
             <el-card class="user-content" shadow="hover" :body-style="{ padding: '20px 50px', height: '100%', boxSizing: 'border-box' }">
                 <el-tabs tab-position="left" v-model="activeName">
-                    <el-tab-pane name="label1" label="系统通知" class="user-tabpane">
+                    <el-tab-pane name="label1" label="系统通知" class="user-tabpane" v-if="notice">
                       <div class="plugins-tips">
                         {{ notice }}
                       </div>
@@ -73,9 +73,10 @@ import { reactive, ref } from 'vue';
 import {loginOut, simpleApi} from "@/api";
 import {ElMessage} from "element-plus";
 import {usePermissStore} from "@/store/permiss";
+const activeName = ref('label2');
 
 const username = localStorage.getItem('admin:username');
-const role = localStorage.getItem('admin:role');
+const rolename = localStorage.getItem('admin:rolename');
 const truename = localStorage.getItem('admin:truename') || '';
 const phone = localStorage.getItem('admin:phone') || '';
 const email = localStorage.getItem('admin:email') || '';
@@ -84,6 +85,9 @@ const expiresAt = localStorage.getItem('admin:expires_at') || '';
 const permiss = usePermissStore();
 
 const notice = permiss.config['notice'];
+if (notice !== ""){
+  activeName.value = 'label1';
+}
 
 const formProfile = reactive({
   truename: truename,
@@ -125,8 +129,6 @@ const onSubmitPassword = () => {
     });
   });
 };
-
-const activeName = ref('label1');
 
 </script>
 

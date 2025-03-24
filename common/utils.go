@@ -3,6 +3,7 @@ package common
 import (
 	"encoding/json"
 	"errors"
+	"regexp"
 )
 
 func Str2Int(str string) int {
@@ -35,4 +36,16 @@ func InArray[T comparable](needle T, haystack []T) bool {
 		}
 	}
 	return false
+}
+
+func ValidateEmail(email string) error {
+	re := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	matched, err := regexp.MatchString(re, email)
+	if err != nil {
+		return err
+	}
+	if !matched {
+		return errors.New("邮箱格式错误")
+	}
+	return nil
 }

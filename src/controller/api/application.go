@@ -5,9 +5,9 @@ import (
 	"asynctaskhub/global"
 	"asynctaskhub/src/model"
 	"asynctaskhub/src/service"
+	"asynctaskhub/src/types"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"time"
 )
 
 type ControllerApiApplication struct {
@@ -28,19 +28,32 @@ type requestUpdateApplication struct {
 	Remark    string `json:"remark"`                        // 备注
 }
 
+type responseApplication struct {
+	ID        int              `json:"id"`         // 应用ID
+	Name      string           `json:"name"`       // 应用名称
+	AppKey    string           `json:"app_key"`    // 应用标识
+	AppSecret string           `json:"app_secret"` // 应用秘钥
+	Remark    string           `json:"remark"`     // 备注
+	CreatedAt types.Customtime `json:"created_at"` // 创建时间
+	UpdatedAt types.Customtime `json:"updated_at"` // 更新时间
+	Username  string           `json:"username"`   // 更新时间
+}
+
 func (c *ControllerApiApplication) GetList(ctx *gin.Context) {
 	adminInfo := c.CheckAdmin(ctx)
 
 	page, pageSize := c.GetPaginationParams(ctx, "page", "pageSize")
 	keywords := ctx.DefaultQuery("keywords", "")
 
-	query := global.DB.Model(&model.Application{})
+	query := global.DB.Model(&model.Application{}).
+		Joins("LEFT JOIN admins ON applications.admin_id = admins.id").
+		Select("applications.*, admins.username")
 	if adminInfo.Role != model.GlobalAdmin {
-		query = query.Where("admin_id = ?", adminInfo.ID)
+		query = query.Where("applications.admin_id = ?", adminInfo.ID)
 	}
 
 	if keywords != "" {
-		query = query.Where("(name like ? or app_key like ?)", "%"+keywords+"%", "%"+keywords+"%")
+		query = query.Where("(applications.name like ? or applications.app_key like ?)", "%"+keywords+"%", "%"+keywords+"%")
 	}
 
 	var total int64
@@ -50,15 +63,15 @@ func (c *ControllerApiApplication) GetList(ctx *gin.Context) {
 		return
 	}
 
-	var applicationLists []model.Application
-	if err := query.Order("id desc").Limit(pageSize).Offset((page - 1) * pageSize).Find(&applicationLists).Error; err != nil {
+	var responseApplications []responseApplication
+	if err := query.Order("applications.id desc").Limit(pageSize).Offset((page - 1) * pageSize).Find(&responseApplications).Error; err != nil {
 		global.Logger.Warn("获取应用列表失败", zap.Error(err))
 		c.JSONResponse(ctx, false, "获取应用列表失败", nil)
 		return
 	}
 
 	c.JSONResponse(ctx, true, "获取应用列表成功", gin.H{
-		"list":  applicationLists,
+		"list":  responseApplications,
 		"total": total,
 	})
 }
@@ -72,17 +85,19 @@ func (c *ControllerApiApplication) GetDetail(ctx *gin.Context) {
 		return
 	}
 
-	query := global.DB
+	query := global.DB.Model(&model.Application{}).
+		Joins("LEFT JOIN admins ON applications.admin_id = admins.id").
+		Select("applications.*, admins.username")
 	if adminInfo.Role != model.GlobalAdmin {
-		query = query.Where("admin_id =?", adminInfo.ID)
+		query = query.Where("applications.admin_id =?", adminInfo.ID)
 	}
-	var application model.Application
-	if err := query.First(&application, id).Error; err != nil {
+	var responseApplication responseApplication
+	if err := query.First(&responseApplication, id).Error; err != nil {
 		global.Logger.Warn("获取应用详情失败", zap.Error(err))
 		c.JSONResponse(ctx, false, "获取应用详情失败", nil)
 		return
 	}
-	c.JSONResponse(ctx, true, "获取应用详情成功", &application)
+	c.JSONResponse(ctx, true, "获取应用详情成功", &responseApplication)
 }
 
 func (c *ControllerApiApplication) Create(ctx *gin.Context) {
@@ -112,8 +127,6 @@ func (c *ControllerApiApplication) Create(ctx *gin.Context) {
 		AppSecret: input.AppSecret,
 		Remark:    input.Remark,
 		AdminID:   adminInfo.ID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
 	}
 	if err := global.DB.Create(&application).Error; err != nil {
 		global.Logger.Warn("创建应用失败", zap.Error(err))
@@ -160,7 +173,6 @@ func (c *ControllerApiApplication) Update(ctx *gin.Context) {
 	app.AppKey = input.AppKey
 	app.AppSecret = input.AppSecret
 	app.Remark = input.Remark
-	app.UpdatedAt = time.Now()
 	if err := query.Omit("created_at", "admin_id").Save(&app).Error; err != nil {
 		global.Logger.Warn("更新应用失败", zap.Error(err))
 		c.JSONResponse(ctx, false, "更新应用失败", nil)

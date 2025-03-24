@@ -38,8 +38,6 @@ func (router *RouterApi) LoadRouter(r *gin.Engine) *gin.Engine {
 		apiGroup.POST("admin/resetPassword", controllerApiAdmin.ResetPassword)
 		apiGroup.POST("admin/updateProfile", controllerApiAdmin.UpdateProfile)
 
-		apiGroup.GET("admin/getLoginLog", controllerApiAdmin.GetLoginLog)
-
 		controllerApiLog := &api.ControllerApiLog{}
 		apiGroup.GET("log/getList", controllerApiLog.GetList)
 		apiGroup.GET("log/getDetail", controllerApiLog.GetDetail)

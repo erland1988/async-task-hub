@@ -54,7 +54,7 @@ func LoginMiddleware() gin.HandlerFunc {
 				return
 			}
 
-			if admin.ExpiresAt.Before(time.Now()) {
+			if time.Time(admin.ExpiresAt).Before(time.Now()) {
 				c.JSON(http.StatusUnauthorized, gin.H{"error": "无效的app凭证"})
 				c.Abort()
 				return
@@ -75,7 +75,7 @@ func LoginMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		if login.ExpiresAt.Before(time.Now()) {
+		if time.Time(login.ExpiresAt).Before(time.Now()) {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "无效或者过期的token"})
 			c.Abort()
 			return
@@ -88,7 +88,7 @@ func LoginMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		if admin.ExpiresAt.Before(time.Now()) {
+		if time.Time(admin.ExpiresAt).Before(time.Now()) {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "无效或者过期的token"})
 			c.Abort()
 			return
