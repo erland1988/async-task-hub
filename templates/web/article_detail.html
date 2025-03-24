@@ -1,0 +1,78 @@
+{{define "web/article_detail.html"}}
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="旅行费用分摊计算器，帮助用户在旅途中轻松分摊费用，确保每个人的支出透明公正，让旅行更加愉快无忧。">
+    <meta name="keywords" content="旅行, 费用分摊, 计算器, 旅行分摊, 旅游攻略">
+    <title>{{.article.Title}} - 旅行费用分摊计算器 - 让旅行更轻松</title>
+    <link rel="stylesheet" href="/static/css/common.css">
+    <style>
+        .article-item {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+        }
+        .article-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .article-time {
+            font-size: 14px;
+            color: #888;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .article-time span {
+            font-weight: normal;
+        }
+        .article-content p {
+            margin-bottom: 20px;
+            line-height: 1.7;
+            font-size: 18px;
+            color: #333;
+            text-align: justify;
+            text-justify: inter-ideograph;
+        }
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>旅行费用分摊计算器</h1>
+</div>
+
+<div class="container" id="app">
+    {{template "header.html"}}
+    <section class="features">
+        <div class="article-item">
+            <h1 class="article-title">{{.article.Title}}</h1>
+            <p class="article-time">{{.article.UpdatedAt | formatDate}}</p>
+            <div class="article-content">{{.article.Content | safeHTML}}</div>
+        </div>
+    </section>
+
+    <section class="call-to-action">
+        <h2>马上开始你的愉快旅程吧！</h2>
+        <a href="/calc/add_title">创建你的旅行计算器</a>
+    </section>
+</div>
+{{template "footer.html"}}
+</body>
+{{template "tongji.html"}}
+</html>
+{{end}}
