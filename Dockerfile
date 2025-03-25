@@ -35,6 +35,6 @@ COPY --from=builder /app/templates ./templates
 COPY --from=builder /app/static ./static
 COPY --from=builder /app/public ./public
 
-EXPOSE 8080
+EXPOSE 9090
 
 CMD ["./main"]
