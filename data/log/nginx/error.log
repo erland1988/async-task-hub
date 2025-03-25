@@ -1,0 +1,5 @@
+2025/03/04 10:35:21 [info] 31#31: *3 SSL_do_handshake() failed (SSL: error:14094416:SSL routines:ssl3_read_bytes:sslv3 alert certificate unknown:SSL alert number 46) while SSL handshaking, client: 172.23.0.1, server: 0.0.0.0:443
+2025/03/04 10:35:31 [info] 31#31: *1 client timed out (110: Operation timed out) while waiting for request, client: 172.23.0.1, server: 0.0.0.0:80
+2025/03/04 10:37:59 [info] 31#31: *4 client timed out (110: Operation timed out) while waiting for request, client: 172.23.0.1, server: 0.0.0.0:80
+2025/03/04 13:08:11 [emerg] 1#1: host not found in upstream "tkerland_app_service:8080" in /etc/nginx/nginx.conf:9
+2025/03/04 13:14:49 [emerg] 1#1: host not found in upstream "tkerland_app_service:8080" in /etc/nginx/nginx.conf:9
