@@ -1,11 +1,11 @@
 package api
 
 import (
-	"asynctaskhub/common"
-	"asynctaskhub/global"
-	"asynctaskhub/src/model"
-	"asynctaskhub/src/service/queue"
-	"asynctaskhub/src/types"
+	"async-task-hub/common"
+	"async-task-hub/global"
+	"async-task-hub/src/model"
+	"async-task-hub/src/service/queue"
+	"async-task-hub/src/types"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"time"

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"asynctaskhub/global"
-	_ "asynctaskhub/src/router"
-	"asynctaskhub/src/service"
-	"asynctaskhub/src/service/queue"
+	"async-task-hub/global"
+	_ "async-task-hub/src/router"
+	"async-task-hub/src/service"
+	"async-task-hub/src/service/queue"
 	"context"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"

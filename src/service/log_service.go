@@ -1,9 +1,9 @@
 package service
 
 import (
-	"asynctaskhub/common"
-	"asynctaskhub/global"
-	"asynctaskhub/src/model"
+	"async-task-hub/common"
+	"async-task-hub/global"
+	"async-task-hub/src/model"
 	"errors"
 )
 

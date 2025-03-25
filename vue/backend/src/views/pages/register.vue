@@ -15,15 +15,6 @@
                         </template>
                     </el-input>
                 </el-form-item>
-                <el-form-item prop="email">
-                    <el-input v-model="param.email" placeholder="邮箱">
-                        <template #prepend>
-                            <el-icon>
-                                <Message />
-                            </el-icon>
-                        </template>
-                    </el-input>
-                </el-form-item>
                 <el-form-item prop="password">
                     <el-input
                         type="password"
@@ -52,12 +43,12 @@ import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus';
 import { Register } from '@/types/user';
+import {simpleApi} from "@/api";
 
 const router = useRouter();
 const param = reactive<Register>({
     username: '',
     password: '',
-    email: '',
 });
 
 const rules: FormRules = {
@@ -69,15 +60,16 @@ const rules: FormRules = {
         },
     ],
     password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-    email: [{ required: true, message: '请输入邮箱', trigger: 'blur' }],
 };
 const register = ref<FormInstance>();
 const submitForm = (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate((valid: boolean) => {
         if (valid) {
-            ElMessage.success('注册成功，请登录');
-            router.push('/login');
+            simpleApi.postForm('/api/admin/register', param, '', function (data) {
+              ElMessage.success('注册成功，请登录');
+              router.push('/login');
+            })
         } else {
             return false;
         }

@@ -22,7 +22,7 @@
 import { ref, reactive } from 'vue';
 import {ElMessage, FormRules} from 'element-plus';
 import { CirclePlusFilled } from '@element-plus/icons-vue';
-import {User, UserEdit} from '@/types/user';
+import {User} from '@/types/user';
 import {simpleApi} from '@/api';
 import TableCustom from '@/components/table-custom.vue';
 import TableDetail from '@/components/table-detail.vue';

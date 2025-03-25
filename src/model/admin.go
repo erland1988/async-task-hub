@@ -1,7 +1,7 @@
 package model
 
 import (
-	"asynctaskhub/src/types"
+	"async-task-hub/src/types"
 	"encoding/json"
 	"errors"
 	"gorm.io/gorm"

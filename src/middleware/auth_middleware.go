@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"asynctaskhub/global"
-	"asynctaskhub/src/model"
+	"async-task-hub/global"
+	"async-task-hub/src/model"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"

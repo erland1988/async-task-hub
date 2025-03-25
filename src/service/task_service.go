@@ -1,8 +1,8 @@
 package service
 
 import (
-	"asynctaskhub/global"
-	"asynctaskhub/src/model"
+	"async-task-hub/global"
+	"async-task-hub/src/model"
 	"errors"
 	"go.uber.org/zap"
 )

@@ -1,10 +1,10 @@
 package service
 
 import (
-	"asynctaskhub/common"
-	"asynctaskhub/global"
-	"asynctaskhub/src/model"
-	"asynctaskhub/src/types"
+	"async-task-hub/common"
+	"async-task-hub/global"
+	"async-task-hub/src/model"
+	"async-task-hub/src/types"
 	"go.uber.org/zap"
 	"strconv"
 	"time"

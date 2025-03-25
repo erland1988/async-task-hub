@@ -1,7 +1,7 @@
 package common
 
 import (
-	"asynctaskhub/src/types"
+	"async-task-hub/src/types"
 	"time"
 )
 

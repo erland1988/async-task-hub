@@ -13,7 +13,7 @@
 
 <script setup lang="ts" name="system-user">
 import { ref, reactive } from 'vue';
-import { Log } from '@/types/Log';
+import { Log } from '@/types/log';
 import { User } from "@/types/user";
 import {simpleApi} from '@/api';
 import TableCustom from '@/components/table-custom.vue';

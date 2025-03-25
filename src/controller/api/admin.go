@@ -1,11 +1,11 @@
 package api
 
 import (
-	"asynctaskhub/common"
-	"asynctaskhub/global"
-	"asynctaskhub/src/model"
-	"asynctaskhub/src/service"
-	"asynctaskhub/src/types"
+	"async-task-hub/common"
+	"async-task-hub/global"
+	"async-task-hub/src/model"
+	"async-task-hub/src/service"
+	"async-task-hub/src/types"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"time"
@@ -302,8 +302,8 @@ func (c *ControllerApiAdmin) Registry(ctx *gin.Context) {
 		c.JSONResponse(ctx, false, "注册管理员失败", nil)
 		return
 	}
-	service.NewLogService().CreateLog(admin.ID, "注册", admin)
-	c.JSONResponse(ctx, true, "注册管理员成功", admin)
+	service.NewLogService().CreateLog(admin.ID, "注册", nil)
+	c.JSONResponse(ctx, true, "注册管理员成功", nil)
 }
 
 func (c *ControllerApiAdmin) Login(ctx *gin.Context) {

@@ -1,10 +1,10 @@
 package api
 
 import (
-	"asynctaskhub/common"
-	"asynctaskhub/global"
-	"asynctaskhub/src/model"
-	"asynctaskhub/src/service"
+	"async-task-hub/common"
+	"async-task-hub/global"
+	"async-task-hub/src/model"
+	"async-task-hub/src/service"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )

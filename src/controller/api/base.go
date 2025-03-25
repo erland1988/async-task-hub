@@ -1,8 +1,8 @@
 package api
 
 import (
-	"asynctaskhub/common"
-	"asynctaskhub/src/middleware"
+	"async-task-hub/common"
+	"async-task-hub/src/middleware"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

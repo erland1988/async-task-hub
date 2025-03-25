@@ -1,6 +1,6 @@
 package model
 
-import "asynctaskhub/src/types"
+import "async-task-hub/src/types"
 
 type Login struct {
 	ID        int              `gorm:"type:bigint(20) unsigned;primaryKey;autoIncrement" json:"id"`      // 主键ID

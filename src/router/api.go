@@ -1,9 +1,9 @@
 package router
 
 import (
-	"asynctaskhub/global"
-	"asynctaskhub/src/controller/api"
-	"asynctaskhub/src/middleware"
+	"async-task-hub/global"
+	"async-task-hub/src/controller/api"
+	"async-task-hub/src/middleware"
 	"github.com/gin-gonic/gin"
 	"time"
 )

@@ -1,8 +1,8 @@
 package queue
 
 import (
-	"asynctaskhub/global"
-	"asynctaskhub/src/model"
+	"async-task-hub/global"
+	"async-task-hub/src/model"
 	"context"
 	"go.uber.org/zap"
 	"time"

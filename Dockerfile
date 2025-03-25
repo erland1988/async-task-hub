@@ -8,8 +8,6 @@ RUN npm config set registry https://registry.npmmirror.com
 
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 
-RUN cd vue/frontend && npm install && npm run build && npm cache clean --force
-
 RUN cd vue/backend && npm install && npm run build && npm cache clean --force
 
 
