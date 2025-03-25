@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-  nginx_service:
+  async_task_hub_nginx:
     image: nginx:1.19.1-alpine
     container_name: async_task_hub_nginx
     deploy:
@@ -18,7 +18,7 @@ services:
     networks:
       - default
 
-  app_service:
+  async_task_hub_app:
     build: .
     deploy:
       replicas: 3
