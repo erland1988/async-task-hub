@@ -29,7 +29,9 @@
                 </div>
                 <el-button class="login-btn" type="primary" size="large" @click="submitForm(login)">登录</el-button>
                 <p class="login-tips"></p>
-                <p class="login-text"></p>
+                <p class="login-text">
+                  没有账号？<el-link type="primary" @click="$router.push('/register')">立即注册</el-link>
+                </p>
             </el-form>
         </div>
     </div>
