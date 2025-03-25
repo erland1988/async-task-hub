@@ -29,7 +29,7 @@ WORKDIR /app
 RUN apk add --no-cache tzdata
 
 COPY --from=builder /app/main .
-COPY --from=builder /app/templates ./templates
+#COPY --from=builder /app/templates ./templates
 COPY --from=builder /app/static ./static
 COPY --from=builder /app/public ./public
 
