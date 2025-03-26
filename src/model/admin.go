@@ -20,7 +20,7 @@ var Rolenames = map[AdminRole]string{
 }
 
 var RolePermissions = map[AdminRole][]string{
-	GlobalAdmin: {"0", "1", "11", "2", "21", "3", "31", "4", "41", "5", "51", "6", "61"},
+	GlobalAdmin: {"0", "1", "11", "2", "21", "3", "31", "4", "41", "5", "51", "6", "61", "62"},
 	AppAdmin:    {"0", "2", "21", "3", "31", "4", "41", "5", "51"},
 }
 

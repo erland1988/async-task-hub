@@ -88,6 +88,12 @@ export const menuData: Menus[] = [
                 pid: '6',
                 index: '/system-log',
                 title: '操作日志',
+            },
+            {
+                id: '62',
+                pid: '6',
+                index: '/system-config',
+                title: '设置中心',
             }
         ],
     },

@@ -33,8 +33,8 @@ func NewQueueService() *QueueService {
 		recoverLostTaskslockKey: global.CacheKey("queue_monitor_lock"),
 		maxBackoff:              300,
 		maxExecutionCount:       4,
-		futureTime:              2 * time.Hour,
-		recoverTime:             5 * time.Minute,
+		futureTime:              24 * time.Hour,
+		recoverTime:             2 * time.Hour,
 		ExecutorClient:          NewExecutorClient(),
 	}
 }
@@ -50,7 +50,6 @@ func (s *QueueService) PushTaskToQueue(taskQueue *model.TaskQueue) error {
 	futureTime := types.Timestamp(time.Now().Add(s.futureTime).Unix())
 	if taskQueue.ExecutionTime > futureTime {
 		global.Logger.Info("taskQueue.ExecutionTime is too far in the future", zap.Int("taskQueue.ExecutionTime", int(taskQueue.ExecutionTime)), zap.Int("futureTime", int(futureTime)))
-
 		return nil
 	}
 
@@ -132,8 +131,7 @@ func (s *QueueService) ProcessTaskQueue(ctx context.Context, taskQueueID int) er
 
 // 恢复 Redis 队列中丢失的任务
 func (s *QueueService) RecoverLostTasks() {
-	var taskQueues []model.TaskQueue
-
+	global.Logger.Info("RecoverLostTasks start", zap.Any("recoverTime", s.recoverTime))
 	success, err := global.REDIS.SetNX(context.Background(), s.recoverLostTaskslockKey, "locked", s.recoverTime).Result()
 	if err != nil || !success {
 		return
@@ -142,6 +140,7 @@ func (s *QueueService) RecoverLostTasks() {
 	global.Logger.Info("RecoverLostTasks start")
 	futureTime := types.Timestamp(time.Now().Add(s.futureTime).Unix())
 
+	var taskQueues []model.TaskQueue
 	query := global.DB
 	query = query.Where("execution_status IN (?,?)", model.TaskQueuePending, model.TaskQueueFailed)
 	query = query.Where("execution_time <?", futureTime)

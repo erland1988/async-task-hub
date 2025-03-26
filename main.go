@@ -66,6 +66,8 @@ func main() {
 	taskScheduler.StartTaskQueueListener(ctx)
 	go taskScheduler.StartTaskQueueMonitor(ctx)
 
+	go service.NewClearService().StartClearMonitor(ctx)
+
 	r := gin.Default()
 	r.SetFuncMap(template.FuncMap{
 		"formatDate": func(t time.Time) string {

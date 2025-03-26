@@ -1,8 +1,10 @@
 package queue
 
 import (
+	"async-task-hub/common"
 	"async-task-hub/global"
 	"async-task-hub/src/model"
+	"async-task-hub/src/service"
 	"context"
 	"go.uber.org/zap"
 	"time"
@@ -90,7 +92,7 @@ func (s *TaskScheduler) StartTaskQueueListener(ctx context.Context) {
 func (s *TaskScheduler) StartTaskQueueMonitor(ctx context.Context) {
 	s.QueueService.RecoverLostTasks()
 
-	ticker := time.NewTicker(time.Minute)
+	ticker := time.NewTicker(30 * time.Minute)
 	defer ticker.Stop()
 
 	for {
@@ -99,7 +101,25 @@ func (s *TaskScheduler) StartTaskQueueMonitor(ctx context.Context) {
 			global.Logger.Info("StartTaskQueueMonitor stopped.")
 			return
 		case <-ticker.C:
+			s.ReloadConfig()
 			s.QueueService.RecoverLostTasks()
 		}
 	}
+}
+
+// 重置系统配置信息
+func (s *TaskScheduler) ReloadConfig() {
+	executorTimeoutVal, err := service.NewConfigService().GetConfig("executor_timeout")
+	if err == nil {
+		executorTimeoutInt := common.Str2Int(executorTimeoutVal)
+		if executorTimeoutInt > 0 {
+			executorTimeout := time.Duration(executorTimeoutInt) * time.Second
+			if executorTimeout != s.QueueService.ExecutorClient.timeout {
+				global.Logger.Info("executor_timeout changed", zap.Int("executorTimeoutInt", executorTimeoutInt))
+				s.QueueService.ExecutorClient.timeout = executorTimeout
+				return
+			}
+		}
+	}
+	return
 }

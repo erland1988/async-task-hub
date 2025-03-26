@@ -3,6 +3,7 @@ package api
 import (
 	"async-task-hub/global"
 	"async-task-hub/src/model"
+	"async-task-hub/src/service"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -18,15 +19,11 @@ func (c *ControllerApiConfig) GetConfigs(ctx *gin.Context) {
 		return
 	}
 
-	var configs []model.Config
-	if err := global.DB.Find(&configs).Error; err != nil {
+	configMap, err := service.NewConfigService().GetConfigMap()
+	if err != nil {
 		global.Logger.Warn("获取配置失败", zap.Error(err))
 		c.JSONResponse(ctx, false, "获取配置失败", nil)
 		return
-	}
-	configMap := make(map[string]string)
-	for _, config := range configs {
-		configMap[config.Key] = config.Value
 	}
 
 	c.JSONResponse(ctx, true, "获取配置成功", configMap)
@@ -35,20 +32,17 @@ func (c *ControllerApiConfig) GetConfigs(ctx *gin.Context) {
 func (c *ControllerApiConfig) GetCustomerConfigs(ctx *gin.Context) {
 	_ = c.CheckAdmin(ctx)
 
+	configMap := make(map[string]string)
 	keys := []string{
 		"notice",
 	}
-	var configs []model.Config
-	if err := global.DB.Where("`key` IN (?)", keys).Find(&configs).Error; err != nil {
-		global.Logger.Warn("获取配置失败", zap.Error(err))
-		c.JSONResponse(ctx, false, "获取配置失败", nil)
-		return
+	for _, key := range keys {
+		value, err := service.NewConfigService().GetConfig(key)
+		if err != nil {
+			value = ""
+		}
+		configMap[key] = value
 	}
-	configMap := make(map[string]string)
-	for _, config := range configs {
-		configMap[config.Key] = config.Value
-	}
-
 	c.JSONResponse(ctx, true, "获取配置成功", configMap)
 }
 
@@ -59,16 +53,16 @@ func (c *ControllerApiConfig) UpdateConfigs(ctx *gin.Context) {
 		return
 	}
 
-	var configs []model.Config
+	var configs map[string]string
 	if err := ctx.ShouldBindJSON(&configs); err != nil {
 		c.JSONResponse(ctx, false, "参数解析失败", nil)
 		return
 	}
 
-	for _, config := range configs {
-		if err := global.DB.Where("`key` = ?", config.Key).Updates(&config).Error; err != nil {
-			global.Logger.Warn("修改配置失败", zap.Error(err))
-			c.JSONResponse(ctx, false, "修改配置失败", nil)
+	for key, value := range configs {
+		if err := service.NewConfigService().UpdateConfig(key, value); err != nil {
+			global.Logger.Warn("更新配置失败", zap.Error(err))
+			c.JSONResponse(ctx, false, "更新配置失败", nil)
 			return
 		}
 	}

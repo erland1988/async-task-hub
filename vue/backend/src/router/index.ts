@@ -95,6 +95,15 @@ const routes: RouteRecordRaw[] = [
                 },
                 component: () => import('../views/system/log.vue'),
             },
+            {
+                path: '/system-config',
+                name: 'system-config',
+                meta: {
+                    title: '设置中心',
+                    permiss: '62',
+                },
+                component: () => import('../views/system/config.vue'),
+            },
         ],
     },
     {
@@ -104,6 +113,14 @@ const routes: RouteRecordRaw[] = [
             noAuth: true,
         },
         component: () => import('../views/pages/login.vue'),
+    },
+    {
+        path: '/register',
+        meta: {
+            title: '注册',
+            noAuth: true,
+        },
+        component: () => import('../views/pages/register.vue'),
     },
     {
         path: '/403',

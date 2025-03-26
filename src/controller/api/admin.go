@@ -281,7 +281,7 @@ func (c *ControllerApiAdmin) Delete(ctx *gin.Context) {
 	c.JSONResponse(ctx, true, "删除管理员成功", nil)
 }
 
-func (c *ControllerApiAdmin) Registry(ctx *gin.Context) {
+func (c *ControllerApiAdmin) Register(ctx *gin.Context) {
 	username := ctx.PostForm("username")
 	password := ctx.PostForm("password")
 	if username == "" || password == "" {

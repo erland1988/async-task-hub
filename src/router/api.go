@@ -15,7 +15,7 @@ func (router *RouterApi) LoadRouter(r *gin.Engine) *gin.Engine {
 	noAuthApiGroup := r.Group("/api")
 	{
 		controllerApiAdmin := &api.ControllerApiAdmin{}
-		noAuthApiGroup.POST("admin/registry", middleware.RateLimiterMiddleware(middleware.NewRateLimiter(3, time.Minute*10)), controllerApiAdmin.Registry)
+		noAuthApiGroup.POST("admin/register", middleware.RateLimiterMiddleware(middleware.NewRateLimiter(3, time.Minute*10)), controllerApiAdmin.Register)
 		noAuthApiGroup.POST("admin/login", middleware.RateLimiterMiddleware(middleware.NewRateLimiter(3, time.Minute)), controllerApiAdmin.Login)
 	}
 	apiGroup := r.Group("/api", middleware.LoginMiddleware())
