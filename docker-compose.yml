@@ -24,7 +24,7 @@ services:
       replicas: 3
       resources:
         limits:
-          memory: 1024M
+          memory: 256M
     expose:
       - "9090"
     volumes:
