@@ -18,15 +18,11 @@
 
 ### 好问
 
-[<img src="https://static.bestqa.net/logo/bestqa_haowen.png" width="220" height="100">](https://www.bestqa.net/home/index.html)
-
 专业问卷服务，一对一客服，按需定制
 
 ## 支持作者
 
 请作者喝杯咖啡吧！(微信号：linxin_20)
-
-![微信扫一扫](https://lin-xin.github.io/images/weixin.jpg)
 
 ## 前言
 
@@ -64,16 +60,6 @@ npm run dev
 // 执行构建命令，生成的dist文件夹放在服务器下即可访问
 npm run build
 ```
-
-## 项目截图
-
-### 首页
-
-![Image text](https://github.com/lin-xin/manage-system/raw/master/screenshots/wms1.png)
-
-### 登录
-
-![Image text](https://github.com/lin-xin/manage-system/raw/master/screenshots/wms3.png)
 
 ## License
 

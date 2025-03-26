@@ -41,10 +41,10 @@ func InitializeLogger(config Config) {
 	if config.APP_LOG_FILENAME != "" {
 		fileWriter := zapcore.AddSync(&lumberjack.Logger{
 			Filename:   config.APP_LOG_FILENAME,
-			MaxSize:    10,   // 每个日志文件最大 10 MB
-			MaxBackups: 7,    // 保留 7 个备份
-			MaxAge:     30,   // 文件最大保存 30 天
-			Compress:   true, // 是否压缩备份日志
+			MaxSize:    10,    // 每个日志文件最大 10 MB
+			MaxBackups: 0,     // 保留 7 个备份
+			MaxAge:     30,    // 文件最大保存 30 天
+			Compress:   false, // 是否压缩备份日志
 		})
 		fileCore := zapcore.NewCore(encoder, fileWriter, logLevel)
 		cores = append(cores, fileCore)
