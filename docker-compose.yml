@@ -22,9 +22,6 @@ services:
     build: .
     deploy:
       replicas: 3
-      update_config:
-        parallelism: 1
-        delay: 3s
       resources:
         limits:
           memory: 1024M
