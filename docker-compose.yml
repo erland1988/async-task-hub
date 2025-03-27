@@ -29,7 +29,7 @@ services:
     expose:
       - "9090"
     volumes:
-      - ./data/log:/app/log:rw
+      - ./data/log:/data/app/log:rw
     environment:
       - TZ=Asia/Shanghai
       - BASE_PATH=${BASE_PATH}
