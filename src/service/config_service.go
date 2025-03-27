@@ -48,7 +48,7 @@ func (s *ConfigService) GetConfig(key string) (string, error) {
 	return config.Value, nil
 }
 
-func (s *ConfigService) UpdateConfig(key, value string) error {
+func (s *ConfigService) UpdateConfig(key string, value string) error {
 	var config model.Config
 	if key == "executor_timeout" {
 		executorTimeout := common.Str2Int(value)

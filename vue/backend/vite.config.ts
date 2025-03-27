@@ -6,7 +6,7 @@ import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 
 export default defineConfig({
-	base: './',
+	base: '/task',
 	build: {
 		outDir: '../../public/backend/', // 输出目录
 		rollupOptions: {
@@ -30,10 +30,10 @@ export default defineConfig({
 	},
 	server: {
 		proxy: {
-			'/api': {
+			'/task/api': {
 				target: 'http://127.0.0.1:9090',
 				changeOrigin: true,
-				rewrite: (path) => path.replace(/^\/api/, '/task/api')
+				//rewrite: (path) => path.replace(/^\/api/, '/task/api')
 			}
 		}
 	},

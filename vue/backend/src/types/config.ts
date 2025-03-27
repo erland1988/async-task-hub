@@ -1,5 +1,5 @@
 export interface Config {
-    clear_time: number;
-    executor_timeout: number;
+    clear_time: string;
+    executor_timeout: string;
     notice: string;
 }
