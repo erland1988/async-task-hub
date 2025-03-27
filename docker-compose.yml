@@ -7,7 +7,7 @@ services:
       resources:
         limits:
           cpus: "0.5"
-          memory: 256M
+          memory: 128M
     ports:
       - "8083:9090"
     volumes:
@@ -25,7 +25,7 @@ services:
       resources:
         limits:
           cpus: "0.5"
-          memory: 256M
+          memory: 128M
     expose:
       - "9090"
     volumes:
