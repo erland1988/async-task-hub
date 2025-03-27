@@ -183,7 +183,7 @@ const homeData = ref({
 });
 
 const getHomeData = async () => {
-  simpleApi.get('/api/common/home', {}, permiss.token, function (data) {
+  simpleApi.get('/task/api/common/home', {}, permiss.token, function (data) {
     homeData.value = data;
   });
 };
@@ -192,7 +192,7 @@ getHomeData();
 const activities = ref([]);
 
 const getActivities = async () => {
-  simpleApi.get('/api/common/timeline', {}, permiss.token, function (data) {
+  simpleApi.get('/task/api/common/timeline', {}, permiss.token, function (data) {
     activities.value = data;
   });
 };

@@ -83,13 +83,13 @@ const setFullScreen = () => {
 };
 
 const permiss = usePermissStore();
-simpleApi.get('/api/config/getCustomerConfigs', {}, permiss.token, function(data){
+simpleApi.get('/task/api/config/getCustomerConfigs', {}, permiss.token, function(data){
   permiss.setConfig(data);
   notice.value = permiss.config['notice'] ? 1 : 0;
 });
 const handleCommand = (command: string) => {
     if (command == 'loginout') {
-      simpleApi.postForm('/api/admin/loginout', {}, permiss.token, function(data){
+      simpleApi.postForm('/task/api/admin/loginout', {}, permiss.token, function(data){
         loginOut();
       });
     } else if (command == 'user') {

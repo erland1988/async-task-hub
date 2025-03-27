@@ -342,14 +342,14 @@ export const mapOptions = {
 };
 
 export const loadData = () => {
-    simpleApi.get('/api/common/line', {}, permiss.token, (data) => {
+    simpleApi.get('/task/api/common/line', {}, permiss.token, (data) => {
         if (data) {
             dashOpt1.value.xAxis.data = data.day.reverse();
             dashOpt1.value.series[0].data = data.execution.reverse();
             dashOpt1.value.series[1].data = data.created.reverse();
         }
     });
-    simpleApi.get('/api/common/pie', {}, permiss.token, (data) => {
+    simpleApi.get('/task/api/common/pie', {}, permiss.token, (data) => {
         if (data) {
             dashOpt2.value.series[0].data = data;
         }

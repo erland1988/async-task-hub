@@ -1,23 +1,7 @@
 import axios from 'axios';
 import {ElMessage} from "element-plus";
-import request from '../utils/request';
 import router from "@/router";
 import {usePermissStore} from "@/store/permiss";
-
-export const fetchData = () => {
-    return request({
-        url: './mock/table.json',
-        method: 'get'
-    });
-};
-
-export const fetchUserData = () => {
-    return request({
-        url: './mock/user.json',
-        method: 'get'
-    });
-};
-
 
 export function loginOut() {
     localStorage.removeItem('admin:username');

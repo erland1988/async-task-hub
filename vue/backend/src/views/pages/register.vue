@@ -66,7 +66,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate((valid: boolean) => {
         if (valid) {
-            simpleApi.postForm('/api/admin/register', param, '', function (data) {
+            simpleApi.postForm('/task/api/admin/register', param, '', function (data) {
               ElMessage.success('注册成功，请登录');
               router.push('/login');
             })

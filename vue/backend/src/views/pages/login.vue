@@ -77,7 +77,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate((valid: boolean) => {
         if (valid) {
-            simpleApi.postForm('/api/admin/login', param, '', function(data){
+            simpleApi.postForm('/task/api/admin/login', param, '', function(data){
               ElMessage.success('登录成功');
               localStorage.setItem('admin:username', data.username);
               localStorage.setItem('admin:rolename', data.rolename);

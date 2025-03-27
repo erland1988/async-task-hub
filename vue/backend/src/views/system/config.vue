@@ -38,7 +38,7 @@ const formConfig = ref<Config>({
   clear_time: 0,
 })
 const getConfigs = () => {
-  simpleApi.get('/api/config/getConfigs', {}, permiss.token, (data) => {
+  simpleApi.get('/task/api/config/getConfigs', {}, permiss.token, (data) => {
     formConfig.value = data;
   });
 }
@@ -50,7 +50,7 @@ const onSubmitConfig = () => {
     executor_timeout: formConfig.value.executor_timeout,
     clear_time: formConfig.value.clear_time,
   }
-  simpleApi.post('/api/config/updateConfigs', params, permiss.token, (data) => {
+  simpleApi.post('/task/api/config/updateConfigs', params, permiss.token, (data) => {
     ElMessage.success('更新成功');
   });
 };

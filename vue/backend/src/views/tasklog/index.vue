@@ -52,7 +52,7 @@ const page = reactive({
 })
 const tableData = ref<TaskLog[]>([]);
 const getData = async () => {
-    simpleApi.get('/api/tasklog/getList', { page: page.index, pageSize: page.size, start: query.start, end: query.end, request_id: query.request_id }, permiss.token, function(data){
+    simpleApi.get('/task/api/tasklog/getList', { page: page.index, pageSize: page.size, start: query.start, end: query.end, request_id: query.request_id }, permiss.token, function(data){
       tableData.value = data.list;
       page.total = data.total;
     });
@@ -71,7 +71,7 @@ const viewData = ref({
     list: []
 });
 const handleView = (row: TaskLog) => {
-    simpleApi.get('/api/tasklog/getDetail', { id: row.id }, permiss.token, function(data){
+    simpleApi.get('/task/api/tasklog/getDetail', { id: row.id }, permiss.token, function(data){
         viewData.value.row = data;
         viewData.value.list = [
           {

@@ -49,7 +49,7 @@ const page = reactive({
 })
 const tableData = ref<Log[]>([]);
 const getData = async () => {
-    simpleApi.get('/api/log/getList', { page: page.index, pageSize: page.size, keywords: query.keywords }, permiss.token, function(data){
+    simpleApi.get('/task/api/log/getList', { page: page.index, pageSize: page.size, keywords: query.keywords }, permiss.token, function(data){
       tableData.value = data.list;
       page.total = data.total;
     });
@@ -68,7 +68,7 @@ const viewData = ref({
     list: []
 });
 const handleView = (row: Log) => {
-    simpleApi.get('/api/log/getDetail', { id: row.id }, permiss.token, function(data) {
+    simpleApi.get('/task/api/log/getDetail', { id: row.id }, permiss.token, function(data) {
       viewData.value.row = data;
       viewData.value.list = [
         {

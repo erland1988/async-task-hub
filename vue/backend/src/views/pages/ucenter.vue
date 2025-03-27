@@ -101,7 +101,7 @@ const onSubmitProfile = () => {
     email: formProfile.email,
   };
 
-  simpleApi.post('/api/admin/updateProfile', params, permiss.token, (data) => {
+  simpleApi.post('/task/api/admin/updateProfile', params, permiss.token, (data) => {
     ElMessage.success('基本信息更新成功');
     localStorage.setItem('admin:truename', formProfile.truename);
     localStorage.setItem('admin:phone', formProfile.phone);
@@ -121,10 +121,10 @@ const onSubmitPassword = () => {
     confirm_password: formPassword.confirmPassword,
   };
 
-  simpleApi.post('/api/admin/resetPassword', params, permiss.token, (data) => {
+  simpleApi.post('/task/api/admin/resetPassword', params, permiss.token, (data) => {
     ElMessage.success('密码修改成功，请重新登录');
     // 修改密码成功后，自动退出登录
-    simpleApi.post('/api/admin/loginout', {}, permiss.token, function(data){
+    simpleApi.post('/task/api/admin/loginout', {}, permiss.token, function(data){
       loginOut();
     });
   });

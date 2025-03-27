@@ -58,7 +58,7 @@ const page = reactive({
 })
 const tableData = ref<Task[]>([]);
 const getData = async () => {
-    simpleApi.get('/api/task/getList', { page: page.index, pageSize: page.size, keywords: query.keywords }, permiss.token, function(data){
+    simpleApi.get('/task/api/task/getList', { page: page.index, pageSize: page.size, keywords: query.keywords }, permiss.token, function(data){
       tableData.value = data.list;
       page.total = data.total;
     });
@@ -84,7 +84,7 @@ const visible = ref(false);
 const isEdit = ref(false);
 const rowData = ref({});
 const handleEdit = (row: Task) => {
-    simpleApi.get('/api/task/getDetail', { id: row.id }, permiss.token, function(data) {
+    simpleApi.get('/task/api/task/getDetail', { id: row.id }, permiss.token, function(data) {
       rowData.value = data;
       isEdit.value = true;
       visible.value = true;
@@ -98,7 +98,7 @@ const updateData = (row: Task) => {
         task_code: row.task_code,
         executor_url: row.executor_url,
       }
-      simpleApi.post('/api/task/update', params, permiss.token, function(data) {
+      simpleApi.post('/task/api/task/update', params, permiss.token, function(data) {
         closeDialog();
         getData();
       })
@@ -108,7 +108,7 @@ const updateData = (row: Task) => {
         task_code: row.task_code,
         executor_url: row.executor_url,
       }
-      simpleApi.post('/api/task/create', params, permiss.token, function(data) {
+      simpleApi.post('/task/api/task/create', params, permiss.token, function(data) {
         closeDialog();
         getData();
       })
@@ -127,7 +127,7 @@ const viewData = ref({
     list: []
 });
 const handleView = (row: Task) => {
-    simpleApi.get('/api/task/getDetail', { id: row.id }, permiss.token, function(data){
+    simpleApi.get('/task/api/task/getDetail', { id: row.id }, permiss.token, function(data){
       viewData.value.row = data;
       viewData.value.list = [
         {
@@ -161,7 +161,7 @@ const handleView = (row: Task) => {
 
 // 删除相关
 const handleDelete = (row: Task) => {
-    simpleApi.postForm('/api/task/delete', { id: row.id }, permiss.token, function(data){
+    simpleApi.postForm('/task/api/task/delete', { id: row.id }, permiss.token, function(data){
       ElMessage.success('删除成功');
       getData();
     })

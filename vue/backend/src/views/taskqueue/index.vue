@@ -53,7 +53,7 @@ const page = reactive({
 })
 const tableData = ref<TaskQueue[]>([]);
 const getData = async () => {
-    simpleApi.get('/api/taskqueue/getList', { page: page.index, pageSize: page.size, start: query.start, end: query.end }, permiss.token, function(data){
+    simpleApi.get('/task/api/taskqueue/getList', { page: page.index, pageSize: page.size, start: query.start, end: query.end }, permiss.token, function(data){
       tableData.value = data.list;
       page.total = data.total;
     });
@@ -72,7 +72,7 @@ const viewData = ref({
     list: []
 });
 const handleView = (row: TaskQueue) => {
-    simpleApi.get('/api/taskqueue/getDetail', { id: row.id }, permiss.token, function(data){
+    simpleApi.get('/task/api/taskqueue/getDetail', { id: row.id }, permiss.token, function(data){
       viewData.value.row = data;
       viewData.value.list = [
         {
