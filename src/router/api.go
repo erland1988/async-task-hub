@@ -12,63 +12,67 @@ type RouterApi struct {
 }
 
 func (router *RouterApi) LoadRouter(r *gin.Engine) *gin.Engine {
-	noAuthApiGroup := r.Group("/api")
+	basePath := global.CONFIG.BASE_PATH
+	apiGroup := r.Group(basePath)
 	{
-		controllerApiAdmin := &api.ControllerApiAdmin{}
-		noAuthApiGroup.POST("admin/register", middleware.RateLimiterMiddleware(middleware.NewRateLimiter(3, time.Minute*10)), controllerApiAdmin.Register)
-		noAuthApiGroup.POST("admin/login", middleware.RateLimiterMiddleware(middleware.NewRateLimiter(3, time.Minute)), controllerApiAdmin.Login)
-	}
-	apiGroup := r.Group("/api", middleware.LoginMiddleware())
-	{
+		noAuthGroup := apiGroup.Group("/api")
+		{
+			controllerApiAdmin := &api.ControllerApiAdmin{}
+			noAuthGroup.POST("admin/register", middleware.RateLimiterMiddleware(middleware.NewRateLimiter(3, time.Minute*10)), controllerApiAdmin.Register)
+			noAuthGroup.POST("admin/login", middleware.RateLimiterMiddleware(middleware.NewRateLimiter(3, time.Minute)), controllerApiAdmin.Login)
+		}
+		authGroup := apiGroup.Group("/api", middleware.LoginMiddleware())
+		{
 
-		controllerApiCommon := &api.ControllerApiCommon{}
-		apiGroup.GET("common/home", controllerApiCommon.Home)
-		apiGroup.GET("common/line", controllerApiCommon.Line)
-		apiGroup.GET("common/pie", controllerApiCommon.Pie)
-		apiGroup.GET("common/timeline", controllerApiCommon.Timeline)
+			controllerApiCommon := &api.ControllerApiCommon{}
+			authGroup.GET("common/home", controllerApiCommon.Home)
+			authGroup.GET("common/line", controllerApiCommon.Line)
+			authGroup.GET("common/pie", controllerApiCommon.Pie)
+			authGroup.GET("common/timeline", controllerApiCommon.Timeline)
 
-		controllerApiAdmin := &api.ControllerApiAdmin{}
-		apiGroup.POST("admin/loginout", controllerApiAdmin.Loginout)
-		apiGroup.GET("admin/getList", controllerApiAdmin.GetList)
-		apiGroup.GET("admin/getDetail", controllerApiAdmin.GetDetail)
-		apiGroup.POST("admin/create", controllerApiAdmin.Create)
-		apiGroup.POST("admin/update", controllerApiAdmin.Update)
-		apiGroup.POST("admin/delete", controllerApiAdmin.Delete)
+			controllerApiAdmin := &api.ControllerApiAdmin{}
+			authGroup.POST("admin/loginout", controllerApiAdmin.Loginout)
+			authGroup.GET("admin/getList", controllerApiAdmin.GetList)
+			authGroup.GET("admin/getDetail", controllerApiAdmin.GetDetail)
+			authGroup.POST("admin/create", controllerApiAdmin.Create)
+			authGroup.POST("admin/update", controllerApiAdmin.Update)
+			authGroup.POST("admin/delete", controllerApiAdmin.Delete)
 
-		apiGroup.POST("admin/resetPassword", controllerApiAdmin.ResetPassword)
-		apiGroup.POST("admin/updateProfile", controllerApiAdmin.UpdateProfile)
+			authGroup.POST("admin/resetPassword", controllerApiAdmin.ResetPassword)
+			authGroup.POST("admin/updateProfile", controllerApiAdmin.UpdateProfile)
 
-		controllerApiLog := &api.ControllerApiLog{}
-		apiGroup.GET("log/getList", controllerApiLog.GetList)
-		apiGroup.GET("log/getDetail", controllerApiLog.GetDetail)
+			controllerApiLog := &api.ControllerApiLog{}
+			authGroup.GET("log/getList", controllerApiLog.GetList)
+			authGroup.GET("log/getDetail", controllerApiLog.GetDetail)
 
-		controllerApiApplication := &api.ControllerApiApplication{}
-		apiGroup.GET("app/getList", controllerApiApplication.GetList)
-		apiGroup.GET("app/getDetail", controllerApiApplication.GetDetail)
-		apiGroup.POST("app/create", controllerApiApplication.Create)
-		apiGroup.POST("app/update", controllerApiApplication.Update)
-		apiGroup.POST("app/delete", controllerApiApplication.Delete)
+			controllerApiApplication := &api.ControllerApiApplication{}
+			authGroup.GET("app/getList", controllerApiApplication.GetList)
+			authGroup.GET("app/getDetail", controllerApiApplication.GetDetail)
+			authGroup.POST("app/create", controllerApiApplication.Create)
+			authGroup.POST("app/update", controllerApiApplication.Update)
+			authGroup.POST("app/delete", controllerApiApplication.Delete)
 
-		controllerApiTask := &api.ControllerApiTask{}
-		apiGroup.GET("task/getList", controllerApiTask.GetList)
-		apiGroup.GET("task/getDetail", controllerApiTask.GetDetail)
-		apiGroup.POST("task/create", controllerApiTask.Create)
-		apiGroup.POST("task/update", controllerApiTask.Update)
-		apiGroup.POST("task/delete", controllerApiTask.Delete)
+			controllerApiTask := &api.ControllerApiTask{}
+			authGroup.GET("task/getList", controllerApiTask.GetList)
+			authGroup.GET("task/getDetail", controllerApiTask.GetDetail)
+			authGroup.POST("task/create", controllerApiTask.Create)
+			authGroup.POST("task/update", controllerApiTask.Update)
+			authGroup.POST("task/delete", controllerApiTask.Delete)
 
-		controllerApiTaskQueue := &api.ControllerApiTaskQueue{}
-		apiGroup.GET("taskqueue/getList", controllerApiTaskQueue.GetList)
-		apiGroup.GET("taskqueue/getDetail", controllerApiTaskQueue.GetDetail)
-		apiGroup.POST("taskqueue/create", controllerApiTaskQueue.Create)
+			controllerApiTaskQueue := &api.ControllerApiTaskQueue{}
+			authGroup.GET("taskqueue/getList", controllerApiTaskQueue.GetList)
+			authGroup.GET("taskqueue/getDetail", controllerApiTaskQueue.GetDetail)
+			authGroup.POST("taskqueue/create", controllerApiTaskQueue.Create)
 
-		controllerApiTaskLog := &api.ControllerApiTaskLog{}
-		apiGroup.GET("tasklog/getList", controllerApiTaskLog.GetList)
-		apiGroup.GET("tasklog/getDetail", controllerApiTaskLog.GetDetail)
+			controllerApiTaskLog := &api.ControllerApiTaskLog{}
+			authGroup.GET("tasklog/getList", controllerApiTaskLog.GetList)
+			authGroup.GET("tasklog/getDetail", controllerApiTaskLog.GetDetail)
 
-		controllerApiConfig := &api.ControllerApiConfig{}
-		apiGroup.GET("config/getConfigs", controllerApiConfig.GetConfigs)
-		apiGroup.GET("config/getCustomerConfigs", controllerApiConfig.GetCustomerConfigs)
-		apiGroup.POST("config/updateConfigs", controllerApiConfig.UpdateConfigs)
+			controllerApiConfig := &api.ControllerApiConfig{}
+			authGroup.GET("config/getConfigs", controllerApiConfig.GetConfigs)
+			authGroup.GET("config/getCustomerConfigs", controllerApiConfig.GetCustomerConfigs)
+			authGroup.POST("config/updateConfigs", controllerApiConfig.UpdateConfigs)
+		}
 	}
 	return r
 }

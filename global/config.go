@@ -8,8 +8,8 @@ import (
 )
 
 type Config struct {
+	BASE_PATH               string
 	APP_ENV                 string
-	APP_URL                 string
 	APP_LOG_MODE            string
 	APP_LOG_FILENAME        string
 	DATABASE_DRIVER         string
@@ -38,8 +38,8 @@ func InitializeConfig() {
 	}
 
 	CONFIG = Config{
+		BASE_PATH:               getEnv("BASE_PATH", ""),
 		APP_ENV:                 getEnv("APP_ENV", "development"),
-		APP_URL:                 getEnv("APP_URL", "http://localhost"),
 		APP_LOG_MODE:            getEnv("APP_LOG_MODE", "warn"),
 		APP_LOG_FILENAME:        getEnv("APP_LOG_FILENAME", ""),
 		DATABASE_DRIVER:         getEnv("DATABASE_DRIVER", "mysql"),
