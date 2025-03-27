@@ -4,11 +4,11 @@
             <el-card class="config-content" shadow="hover" :body-style="{ padding: '20px 50px', height: '100%', boxSizing: 'border-box' }">
                   <el-form class="w500" label-position="top" >
                     <el-form-item label="执行器超时时间：">
-                      <el-input-number type="number" v-model="formConfig.executor_timeout"></el-input-number>
+                      <el-input-number type="number" v-model="formConfig.executor_timeout" min="3" max="1800"></el-input-number>
                       <span style="margin-left: 5px;">秒</span>
                     </el-form-item>
                     <el-form-item label="清理间隔时间：">
-                      <el-input-number type="number" v-model="formConfig.clear_time"></el-input-number>
+                      <el-input-number type="number" v-model="formConfig.clear_time" min="2" max="72"></el-input-number>
                       <span style="margin-left: 5px;">小时</span>
                     </el-form-item>
                     <el-form-item label="系统消息：">

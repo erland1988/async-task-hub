@@ -23,8 +23,7 @@ func NewClearService() *ClearService {
 
 func (s *ClearService) StartClearMonitor(ctx context.Context) {
 	s.Clear()
-	//ticker := time.NewTicker(30 * time.Minute)
-	ticker := time.NewTicker(1 * time.Second)
+	ticker := time.NewTicker(30 * time.Minute)
 	defer ticker.Stop()
 	for {
 		select {

@@ -1,8 +1,10 @@
 package service
 
 import (
+	"async-task-hub/common"
 	"async-task-hub/global"
 	"async-task-hub/src/model"
+	"errors"
 )
 
 type configMap map[string]string
@@ -48,6 +50,24 @@ func (s *ConfigService) GetConfig(key string) (string, error) {
 
 func (s *ConfigService) UpdateConfig(key, value string) error {
 	var config model.Config
+	if key == "executor_timeout" {
+		executorTimeout := common.Str2Int(value)
+		if executorTimeout < 3 {
+			return errors.New("执行器超时时间不能小于3秒")
+		}
+		if executorTimeout > 3600 {
+			return errors.New("执行器超时时间不能大于3600秒")
+		}
+	}
+	if key == "clear_time" {
+		clearTime := common.Str2Int(value)
+		if clearTime < 1 {
+			return errors.New("清理间隔时间不能小于1小时")
+		}
+		if clearTime > 72 {
+			return errors.New("清理间隔时间不能大于72小时")
+		}
+	}
 	if err := global.DB.Where("`key` = ?", key).First(&config).Error; err != nil {
 		return err
 	}
