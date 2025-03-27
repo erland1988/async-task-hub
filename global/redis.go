@@ -19,6 +19,8 @@ var (
 // InitializeRedis 用于初始化 Redis 客户端
 func InitializeRedis(config Config, logger *zap.Logger) error {
 	var err error
+
+	prefix = config.REDIS_PREFIX         // 初始化时设置前缀
 	maxRetries := 10                     // 最大重试次数
 	retryDelay := 300 * time.Millisecond // 重试延迟时间
 
@@ -39,8 +41,6 @@ func InitializeRedis(config Config, logger *zap.Logger) error {
 		logger.Warn("redis connect failed", zap.Int("attempt", i+1), zap.Error(err))
 		time.Sleep(retryDelay)
 	}
-
-	prefix = config.REDIS_PREFIX // 初始化时设置前缀
 	return fmt.Errorf("redis connect failed after %d attempts: %v", maxRetries, err)
 }
 
