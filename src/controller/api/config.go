@@ -67,5 +67,6 @@ func (c *ControllerApiConfig) UpdateConfigs(ctx *gin.Context) {
 		}
 	}
 
+	service.NewLogService().CreateLog(adminInfo.ID, "修改配置", configs)
 	c.JSONResponse(ctx, true, "修改配置成功", nil)
 }

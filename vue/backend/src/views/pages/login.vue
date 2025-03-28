@@ -28,7 +28,9 @@
                     <el-checkbox class="pwd-checkbox" v-model="checked" label="记住密码" />
                 </div>
                 <el-button class="login-btn" type="primary" size="large" @click="submitForm(login)">登录</el-button>
-                <p class="login-tips"></p>
+                <p class="login-tips">
+                  测试账号：test 密码：123456
+                </p>
                 <p class="login-text">
                   没有账号？<el-link type="primary" @click="$router.push('/register')">立即注册</el-link>
                 </p>

@@ -133,7 +133,8 @@ func (c *ControllerApiApplication) Create(ctx *gin.Context) {
 		c.JSONResponse(ctx, false, "创建应用失败", nil)
 		return
 	}
-	c.JSONResponse(ctx, true, "创建任务成功", nil)
+	service.NewLogService().CreateLog(adminInfo.ID, "创建应用", application)
+	c.JSONResponse(ctx, true, "创建应用成功", nil)
 }
 
 func (c *ControllerApiApplication) Update(ctx *gin.Context) {
@@ -178,6 +179,7 @@ func (c *ControllerApiApplication) Update(ctx *gin.Context) {
 		c.JSONResponse(ctx, false, "更新应用失败", nil)
 		return
 	}
+	service.NewLogService().CreateLog(adminInfo.ID, "更新应用", app)
 	c.JSONResponse(ctx, true, "更新应用成功", nil)
 }
 
@@ -203,5 +205,6 @@ func (c *ControllerApiApplication) Delete(ctx *gin.Context) {
 		return
 	}
 
+	service.NewLogService().CreateLog(adminInfo.ID, "删除应用", id)
 	c.JSONResponse(ctx, true, "删除应用成功", nil)
 }

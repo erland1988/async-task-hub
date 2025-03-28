@@ -122,6 +122,7 @@ func (c *ControllerApiTask) Create(ctx *gin.Context) {
 		c.JSONResponse(ctx, false, "创建任务失败", nil)
 		return
 	}
+	service.NewLogService().CreateLog(adminInfo.ID, "创建任务", task)
 	c.JSONResponse(ctx, true, "创建任务成功", nil)
 }
 
@@ -169,6 +170,7 @@ func (c *ControllerApiTask) Update(ctx *gin.Context) {
 		c.JSONResponse(ctx, false, "更新任务失败", nil)
 		return
 	}
+	service.NewLogService().CreateLog(adminInfo.ID, "更新任务", task)
 	c.JSONResponse(ctx, true, "更新任务成功", nil)
 }
 
@@ -200,5 +202,6 @@ func (c *ControllerApiTask) Delete(ctx *gin.Context) {
 		c.JSONResponse(ctx, false, "删除任务失败", nil)
 		return
 	}
+	service.NewLogService().CreateLog(adminInfo.ID, "删除任务", id)
 	c.JSONResponse(ctx, true, "删除任务成功", nil)
 }

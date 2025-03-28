@@ -137,14 +137,14 @@ func (c *ControllerApiTaskQueue) Create(ctx *gin.Context) {
 	taskQueue.TaskID = task.ID
 	taskQueue.Parameters = input.Parameters
 	taskQueue.RelativeDelayTime = input.RelativeDelayTime
-	taskQueue.DelayExecutionTime = types.Timestamp(input.DelayExecutionTime)
+	taskQueue.DelayExecutionTime = input.DelayExecutionTime
 	taskQueue.ExecutionStatus = model.TaskQueuePending
 	taskQueue.ExecutionCount = 0
 
 	if input.RelativeDelayTime != 0 {
 		taskQueue.ExecutionTime = types.Timestamp(int(time.Now().Unix()) + input.RelativeDelayTime)
 	} else if input.DelayExecutionTime != 0 {
-		taskQueue.ExecutionTime = types.Timestamp(input.DelayExecutionTime)
+		taskQueue.ExecutionTime = input.DelayExecutionTime
 	} else {
 		taskQueue.ExecutionTime = types.Timestamp(time.Now().Unix())
 	}
