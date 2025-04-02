@@ -21,7 +21,7 @@ services:
   async_task_hub_app:
     build: .
     deploy:
-      replicas: 3
+      replicas: 2
       resources:
         limits:
           cpus: "0.5"
